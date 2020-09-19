@@ -3,6 +3,9 @@
 # Import libraries
 from tkinter import *
 
+# Import classes
+from music import MusicLibrary
+
 # Global variables
 WIN_WIDTH = 240
 WIN_HEIGHT = 240
@@ -12,9 +15,11 @@ def music_window():
 	# OBJECTIVE: Open a new window with a list of songs
 	print("Music window is open")
 
+	music_library = MusicLibrary(WIN_WIDTH, WIN_HEIGHT)
+
 if __name__ == "__main__":
 
-	# Initialize tkinter()
+	# Initialize tkinter() 
 	root = Tk()
 
 	# Create a 240x240 window (dimensions comes from adafruit screen)
