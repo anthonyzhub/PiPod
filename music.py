@@ -129,9 +129,65 @@ class MusicLibrary:
 		self.music_win.title("Music Library")
 
 		# Create a dictionary dedicated to artist
-		self.artists = dict()
+		self.music_library = dict()
 
+		# Immediately call function to collect device's songs
 		self.get_music()
+
+	def print_music(self, album, head_node):
+
+		# OBJECTIVE: Print link list from self.music_library's values value (no typo)
+
+		# Print data
+		print("\tAlbum: {}".format(album))
+		print("\tSongs:")
+
+		# Iterate link list
+		old_node = head_node
+		while old_node != None:
+			print("\t\t{}".format(old_node.data))
+			old_node = old_node.next
+
+	def print_dictionary(self):
+
+		# OBJECTIVE: Print music library
+
+		print("Printing 'self.music_library'")
+		for artist, albums in self.music_library.items():
+			
+			print("Artist: {}".format(artist))
+
+			for listing in albums:
+
+				# Get key and value
+				temp_key = next(iter(listing))
+				temp_val = listing[temp_key]
+
+				# Print link list of dictionary's value
+				self.print_music(temp_key, temp_val)
+				print()
+
+	def add_songs_from_library(self, album_name, album_dir, songs_list, old_artist_albums):
+
+		# OBJECTIVE: Add an album and its songs as a dictionary to a list
+
+		# If sub_directory is empty and filename isn't, then we are inside an album directory
+		# We're currently in the location of the album's songs
+		if album_dir == [] and songs_list != []:
+			print("Preparing to add '{}' to 'old_artist_albums'".format(album_name))
+
+			ll = LinkList()
+
+			# Add all songs inside directory to link list
+			for song in songs_list:
+				ll.add_node(song)
+
+			# Save album and songs to list
+			old_artist_albums.append({album_name: ll.get_head()})
+			print("Added '{}' with {} to 'old_artist_albums!".format(album_name, ll.get_head()))
+
+		# Return album
+		return old_artist_albums
 
 	def get_music(self):
 
@@ -148,6 +204,7 @@ class MusicLibrary:
 
 			# Get directories and files inside Music directory
 			# string, list, list in os.walk(starting_dir)
+			# NOTE: topdown=True allows os.walk() to go to the bottom of the directory before going to any other
 			for directory, sub_directory, filename in os.walk(starting_dir, topdown=True):
 
 				print("Directory: {}".format(directory))
@@ -178,55 +235,31 @@ class MusicLibrary:
 					# If old_artist == artist, then we haven't changed singers, so there must be more albums
 					if old_artist == artist:
 						print("'old_artist' and 'artist' match!")
+						old_artist_albums = self.add_songs_from_library(album, sub_directory, filename, old_artist_albums)
 
-						# If sub_directory is empty and filename isn't, then we are inside an album directory
-						# We're currently in the location of the album's songs
-						if sub_directory == [] and filename != []:
-							print("Preparing to add a new album to 'old_artist_albums'")
-
-							ll = LinkList()
-
-							# Add all songs inside directory to link list
-							for song in filename:
-								ll.add_node(song)
-
-							# Save album and songs to list
-							old_artist_albums.append({album: ll.get_head()})
-							print("Added {} to {}!".format(ll.get_head(), album))
-
+					# If old_artist != artist, then we already have all the songs from "old_artist" and need to add a new "artist"
 					if old_artist != artist:
 						print("'old_artist' and 'artist' DON'T match!")
 
 						# Add old_artist with old_artist_albums to final dictionary
-						self.artists[old_artist] = copy.deepcopy(old_artist_albums)
-						print("Music Library: {}".format(self.artists))
+						self.music_library[old_artist] = copy.deepcopy(old_artist_albums)
+						# print("Music Library: {}".format(self.music_library))
 
 						# Update variables
 						old_artist = artist
 						old_artist_albums = []
 
-						# If sub_directory is empty and filename isn't, then we are inside an album directory
-						# We're currently in the location of the album's songs
-						if sub_directory == [] and filename != []:
-							print("Preparing to add a new album to 'old_artist_albums'")
-
-							ll = LinkList()
-
-							# Add all songs inside directory to link list
-							for song in filename:
-								ll.add_node(song)
-
-							# Save album and songs to list
-							old_artist_albums.append({album: ll.get_head()})
-							print("Added {} to {}!".format(ll.get_head(), album))
+						old_artist_albums = self.add_songs_from_library(album, sub_directory, filename, old_artist_albums)
 
 				print()
 
+			# Once for-loop ends, save last record of artist's songs and albums
 			# Add old_artist with old_artist_albums to final dictionary
-			self.artists[old_artist] = copy.deepcopy(old_artist_albums)
-			print("Music Library: {}".format(self.artists))
+			self.music_library[old_artist] = copy.deepcopy(old_artist_albums)
+			# print("Music Library: {}".format(self.music_library))
 
+			# Exit while-loop
 			break
 
-
-		print("Final Music Library: {}".format(self.artists))
+		# print("Final Music Library: {}".format(self.music_library))
+		self.print_dictionary()
