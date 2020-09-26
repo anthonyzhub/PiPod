@@ -59,7 +59,7 @@ class LinkList:
 		last_node.next = new_node
 
 		# Update last node
-		self.tail= new_node
+		self.tail = new_node
 
 		# Update counter
 		self.size += 1
@@ -110,7 +110,7 @@ class LinkList:
 
 		return self.head
 
-	def print_list(self):
+	def print_link_list(self):
 
 		# OBJECTIVE: Print all nodes inside link list
 
@@ -121,6 +121,7 @@ class LinkList:
 
 class MusicLibrary:
 
+	"""
 	def __init__(self, WIN_WIDTH, WIN_HEIGHT):
 
 		# Create a new window
@@ -133,6 +134,42 @@ class MusicLibrary:
 
 		# Immediately call function to collect device's songs
 		self.get_music()
+	"""
+
+	def __init__(self):
+		# Create a dictionary dedicated to artist
+		self.music_library = dict()
+
+		# Immediately call function to collect device's songs
+		self.get_music()
+
+	def music_library_window(self):
+
+		# OBJECTIVE: List all songs inside the device onto the window
+
+		# Create a list to hold all songs
+		temp_songs = list()
+
+		# Iterate dictionary and inner dictionary
+		for albums in self.music_library.values():
+			for listing in albums:
+
+				# Get head node (value) from dictionary and
+				node = listing[next(iter(listing))]
+
+				# Iterate link list with head node
+				while node != None:
+
+					# Add song to temp_songs
+					# print("Putting {} to window".format(node.data))
+					temp_songs.append(node.data)
+
+					# Move to next node
+					node = node.next
+
+		# print("Printing songs")
+		for i in sorted(temp_songs):
+			print(i)
 
 	def print_music(self, album, head_node):
 
@@ -184,7 +221,7 @@ class MusicLibrary:
 
 			# Save album and songs to list
 			old_artist_albums.append({album_name: ll.get_head()})
-			print("Added '{}' with {} to 'old_artist_albums!".format(album_name, ll.get_head()))
+			print("Added '{}' with '{}' as head node to 'old_artist_albums!".format(album_name, ll.get_head().data))
 
 		# Return album
 		return old_artist_albums
