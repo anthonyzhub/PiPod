@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 
 # Import libraries
-from tkinter import *
+#from tkinter import *
 
 # Import classes
 from music import MusicLibrary
@@ -10,34 +10,35 @@ from music import MusicLibrary
 WIN_WIDTH = 240
 WIN_HEIGHT = 240
 
-def music_window():
+def musicWindow():
 
 	# OBJECTIVE: Open a new window with a list of songs
 	print("Music window is open")
 
 	music_library = MusicLibrary(WIN_WIDTH, WIN_HEIGHT)
 
-def entry_msg(loc):
-	print("Window: {}".format(loc))
+def entryMsg(location):
+	print("\n{}\nWindow: {}\n{}\n".format("=" * 20, location, "=" * 20))
 
 def music(music_class):
-	entry_msg("Music Library")
-	music_class.music_library_window()
+	entryMsg("Music Library")
+	# music_class.printDictionary()
+	music_class.printMusicLibrary()
 
 def photos():
-	entry_msg("Photo Library")
+	entryMsg("Photo Library")
 
 def videos():
-	entry_msg("Video Library")
+	entryMsg("Video Library")
 
 def extras():
-	entry_msg("Extras")
+	entryMsg("Extras")
 
 def settings():
-	entry_msg("Settings")
+	entryMsg("Settings")
 
 def shuffle():
-	entry_msg("Music Player")
+	entryMsg("Music Player")
 
 if __name__ == "__main__":
 
@@ -59,15 +60,15 @@ if __name__ == "__main__":
 	# Initialize MusicLibrary
 	music_class = MusicLibrary()
 
-	# Print menu
-	print("1. Music\n2. Photos\n3. Videos\n4. Extras\n5. Settings\n6. Shuffle Songs")
-
 	# Ask for input
 	option = 0
 	while True:
 
+		# Print menu
+		print("1. Music\n2. Photos\n3. Videos\n4. Extras\n5. Settings\n6. Shuffle Songs\n-1. Quit")
+
 		try:
-			option = int(input("Select: "))
+			option = int(input("\nSelect: "))
 
 		except ValueError as e:
 			print("Error: {}".format(e))
@@ -89,5 +90,7 @@ if __name__ == "__main__":
 				settings()
 			elif option == 6:
 				shuffle()
+			elif option == -1:
+				exit(1)
 			else:
 				print("Invalid option!")
