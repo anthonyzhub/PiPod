@@ -58,7 +58,7 @@ if __name__ == "__main__":
 	"""
 
 	# Initialize MusicLibrary
-	music_class = MusicLibrary()
+	musicClass = MusicLibrary()
 
 	# Ask for input
 	option = 0
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 			# If "option" is valid, call desired function
 
 			if option == 1:
-				music(music_class)
+				music(musicClass)
 			elif option == 2:
 				photos()
 			elif option == 3:

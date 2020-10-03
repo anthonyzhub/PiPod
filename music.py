@@ -32,12 +32,12 @@ class LinkList:
 		# OBJECTIVE: If list is empty, immediately add a head
 
 		# Create a new node
-		new_node = Node(data)
-		new_node.next = None
+		newNode = Node(data)
+		newNode.next = None
 
 		# Update head node
-		self.head = new_node
-		self.tail = new_node
+		self.head = newNode
+		self.tail = newNode
 
 		# Update counter
 		self.size += 1
@@ -51,17 +51,16 @@ class LinkList:
 			self.addHead(data)
 			return None
 
-		# Get last node
-		last_node = self.tail
-
 		# Create a new node
-		new_node = Node(data)
-		new_node.next = None
+		newNode = Node(data)
+		newNode.next = None
 
-		last_node.next = new_node
+		# Get last node
+		lastNode = self.tail
+		lastNode.next = newNode
 
 		# Update last node
-		self.tail = new_node
+		self.tail = newNode
 
 		# Update counter
 		self.size += 1
@@ -78,26 +77,26 @@ class LinkList:
 		if pos == 1:
 
 			# Get the first 2 nodes
-			old_head = self.head
-			new_head = old_head.next
+			oldHead = self.head
+			newHead = oldHead.next
 
 			# Update head and old node
-			self.head = new_head
-			del old_head
+			self.head = newHead
+			del oldHead
 
 		elif pos > 1 and pos <= self.size:
 			
 			# Iterate link list until position is met
-			curr_node = self.head
-			old_node = curr_node
+			currNode = self.head
+			oldNode = currNode
 
 			for _ in range(pos - 1):
-				old_node = curr_node
-				curr_node = curr_node.next
+				oldNode = currNode
+				currNode = currNode.next
 
 			# Update references and remove node
-			old_node.next = curr_node.next
-			del curr_node
+			oldNode.next = currNode.next
+			del currNode
 
 			# Update counter
 			self.size -= 1
@@ -112,36 +111,36 @@ class LinkList:
 
 		return self.head
 
-	def getMiddleNode(self, head_node):
+	def getMiddleNode(self, headNode):
 
 		# OBJECTIVE: Get middle position of node from link list
 		# NOTE: Cannot use self.size because a link list will be divided by half until there is only 1 left,
 		# 		so the size will be changing
 
 		# Return node if it is empty
-		if head_node == None:
-			return head_node
+		if headNode == None:
+			return headNode
 
 		# Set 2 positions
-		slow_node = head_node
-		fast_node = head_node
+		slowNode = headNode
+		fastNode = headNode
 
 		# Iterate link list
 		# Make sure next node and node after that exist
-		while (fast_node.next != None) and (fast_node.next.next != None):
+		while (fastNode.next != None) and (fastNode.next.next != None):
 
 			# Update nodes
-			slow_node = slow_node.next
-			fast_node = fast_node.next.next
+			slowNode = slowNode.next
+			fastNode = fastNode.next.next
 
 		# Return slow_node as middle node
-		return slow_node
+		return slowNode
 
 	def sortedMerge(self, linkListA, linkListB):
 
 		# OBJECTIVE: Sort 2 halves of the same link list
 
-		result = None
+		newHead = None
 
 		# Check if either halves of the list are none
 		if linkListA == None:
@@ -152,42 +151,39 @@ class LinkList:
 
 		# Make a recursive call, divide called link list, and come back here
 		if linkListA.data <= linkListB.data:
-			result = linkListA
-			result.next = self.sortedMerge(linkListA.next, linkListB)
+			newHead = linkListA
+			newHead.next = self.sortedMerge(linkListA.next, linkListB)
 		else:
-			result = linkListB
-			result.next = self.sortedMerge(linkListA, linkListB.next)
+			newHead = linkListB
+			newHead.next = self.sortedMerge(linkListA, linkListB.next)
 
 		# Return head sorted link list
-		return result
+		return newHead
 
-	def mergeSort(self, head_node):
+	def mergeSort(self, headNode):
 
 		# OBJECTIVE: Sort link list starting with head node
 
 		# Check if link list is empty or by itself
-		if (head_node == None) or (head_node.next == None):
-			return head_node
+		if (headNode == None) or (headNode.next == None):
+			return headNode
 
 		# Get middle node
-		middle_node = self.getMiddleNode(head_node)
-		node_after_middle = middle_node.next
+		middleNode = self.getMiddleNode(headNode)
+		node_after_middle = middleNode.next
 
 		# Set pointer from middle_node to next node as None
 		# NOTE: By setting next as none, middle_node would be the end of the link list
-		middle_node.next = None
+		middleNode.next = None
 
 		# Sort left and right side of link list
-		left_side = self.mergeSort(head_node)
-		right_side = self.mergeSort(node_after_middle)
+		leftSide = self.mergeSort(headNode)
+		rightSide = self.mergeSort(node_after_middle)
 
 		# Merge both sides of the link list to one in sorted order.
 		# The return value of sortedMerge() is the head node of the new link list
-		sorted_link_list = self.sortedMerge(left_side, right_side)
-		return sorted_link_list
-
-		# Update head node
-		# self.head = self.sortedMerge(left_side, right_side)
+		return self.sortedMerge(leftSide, rightSide)
+		# self.head = self.sortedMerge(leftSide, rightSide)
 
 	def printLinkList(self):
 
@@ -241,14 +237,15 @@ class MusicLibrary:
 	def __init__(self):
 
 		# Create a dictionary dedicated to artist
-		self.music_library_dict = dict()
+		self.musicLibraryDict = dict()
 
 		# Gather all songs inside the device and add them to self.music_library{}
 		self.scanMusicDirectory()
 
 		# Create a link list of all the music in sorted order
 		self.finalMusicLinkList = LinkList()
-		self.finalMusicLinkList.head = self.organizeMusicLibrary()
+		# self.finalMusicLinkList.head = self.organizeMusicLibrary()
+		self.organizeMusicLibrary()
 
 	def musicPlayerWindow(self, chosen_song):
 
@@ -256,43 +253,43 @@ class MusicLibrary:
 
 		print("Now Playing: {}".format(chose_song))
 		
-	def mergeTwoSortedLinkList(self, head_a, head_b=None):
+	def mergeTwoSortedLinkList(self, headA, headB=None):
 		# link: https://www.geeksforgeeks.org/merge-sort-for-linked-list/
 		# OBJECTIVE: Merge 2 sorted link list to one by calling functions from LinkList class
 
 		# Create a dummy node
-		dummy_node = Node(0)
+		dummyNode = Node(0)
 
 		# Create a tail node referencing to dummy node
-		tail_node = dummy_node
+		tailNode = dummyNode
 		while True:
 
 			# If either link list is empty, add all elements from the other link list
-			if head_a == None:
+			if headA == None:
 				print("head_a is empty!")
-				tail_node.next = head_b
+				tailNode.next = headB
 				break
 
-			if head_b == None:
+			if headB == None:
 				print("head_b is empty!")
-				tail_node.next = head_a
+				tailNode.next = headA
 				break
 
 			# Compare nodes from both link list to see which goes first in sorted order
-			if head_a.data <= head_b.data:
+			if headA.data <= headB.data:
 				print("Adding head_a as next node")
-				tail_node.next = head_a
-				head_a = head_a.next # BUG: head_a and head_b are not advancing
+				tailNode.next = headA
+				headA = headA.next # BUG: head_a and head_b are not advancing
 			else:
 				print("Adding head_b as next node")
-				tail_node.next = head_b
-				head_b = head_b.next
+				tailNode.next = headB
+				headB = headB.next
 
 			# Update tail node
-			tail_node = tail_node.next
+			tailNode = tailNode.next
 
 		# Return head of merged link list
-		return dummy_node.next
+		return dummyNode.next
 
 	def organizeMusicLibrary(self):
 
@@ -301,41 +298,40 @@ class MusicLibrary:
 		print("Collecting head nodes from each album")
 
 		# Create a list to hold all head nodes inside self.music.library{}
-		head_nodes_list = list()
+		headNodesList = list()
 
 		# Iterate dictionary and inner dictionary
-		for albums in self.music_library_dict.values():
+		for albums in self.musicLibraryDict.values():
 			for album in albums:
 
 				# Get head node (value) from dictionary
-				curr_head = album[next(iter(album))]
-				# curr_head = album.keys()[0]
+				currHead = album[next(iter(album))]
 
 				# Add head node to list
-				head_nodes_list.append(curr_head)
+				headNodesList.append(currHead)
 
 		print("Creating 1 link list")
-		print("head_nodes_list: {}".format(head_nodes_list))
-		old_head = None
-		for pos in range(len(head_nodes_list)):
+		print("head_nodes_list: {}".format(headNodesList))
+		oldHead = None
+		for pos in range(len(headNodesList)):
 
-			print("head_nodes_list[pos]: {}".format(head_nodes_list[pos]))
+			print("head_nodes_list[pos]: {}".format(headNodesList[pos]))
 
 			# Set 2nd parameter as None for 1st and last node
 			if pos == 0:
-				old_head = self.mergeTwoSortedLinkList(head_nodes_list[pos], None)
+				oldHead = self.mergeTwoSortedLinkList(headNodesList[pos], None)
 			else:
-				old_head = self.mergeTwoSortedLinkList(old_head, head_nodes_list[pos])
+				oldHead = self.mergeTwoSortedLinkList(oldHead, headNodesList[pos])
 
-		# Return head of link list
-		return old_head
+		# Update final link list's head
+		self.finalMusicLinkList.head = oldHead
 
 	def printMusicLibrary(self):
 
 		# OBJECTIVE: List all songs inside the device onto the window in alphabetical order
 		self.finalMusicLinkList.printLinkList()
 
-	def printDictionaryValues(self, album, head_node):
+	def printDictionaryValues(self, album, headNode):
 
 		# OBJECTIVE: Print link list from self.music_library's values value (no typo)
 
@@ -344,10 +340,10 @@ class MusicLibrary:
 		print("\tSongs:")
 
 		# Iterate link list
-		old_node = head_node
-		while old_node != None:
-			print("\t\t{}".format(old_node.data))
-			old_node = old_node.next
+		oldNode = headNode
+		while oldNode != None:
+			print("\t\t{}".format(oldNode.data))
+			oldNode = oldNode.next
 
 	def printDictionary(self):
 
@@ -355,7 +351,7 @@ class MusicLibrary:
 
 		# Iterate dictionary
 		print("Printing 'self.music_library_dict\{\}'")
-		for artist, albums in self.music_library_dict.items():
+		for artist, albums in self.musicLibraryDict.items():
 			
 			print("Artist: {}".format(artist))
 
@@ -363,70 +359,69 @@ class MusicLibrary:
 			for listing in albums:
 
 				# Get key and value
-				temp_key = next(iter(listing))
-				temp_val = listing[temp_key]
+				tempKey = next(iter(listing))
+				tempVal = listing[tempKey]
 
 				# Print link list of dictionary's value
-				self.printDictionaryValues(temp_key, temp_val)
+				self.printDictionaryValues(tempKey, tempVal)
 				print()
 
-	def addSongsToDictionary(self, album_name, album_dir, songs_list, old_artist_albums):
+	def addSongsToDictionary(self, albumName, albumDir, songsList, oldArtistAlbums):
 
 		# OBJECTIVE: Add an album and its songs as a dictionary to a list
 
 		# If sub_directory is empty and songs_list isn't, then we are inside an album directory
 		# We're currently in the location of the album's songs
-		if album_dir == [] and songs_list != []:
-			print("Preparing to add '{}' to 'old_artist_albums'".format(album_name))
+		if albumDir == [] and songsList != []:
+			print("Preparing to add '{}' to 'old_artist_albums'".format(albumName))
 
 			ll = LinkList()
 
 			# Add all songs inside directory to link list
-			for song in songs_list:
+			for song in songsList:
 				ll.addNode(song)
 
 			# Sort link list
-			# ll.printLinkList()
 			# ll.mergeSort(ll.getHead()) # <= BUG: mergeSort() is creating a link list that points to the same node infinitely
 			ll.head = ll.mergeSort(ll.getHead())
 			ll.printLinkList()
 
 			# Save album and songs as a dictionary to the list
-			old_artist_albums.append({album_name: ll.getHead()})
-			print("Added '{}' with '{}' as head node to 'old_artist_albums'!".format(album_name, ll.getHead().data))
+			oldArtistAlbums.append({albumName: ll.getHead()})
+			print("Added '{}' with '{}' as head node to 'old_artist_albums'!".format(albumName, ll.getHead().data))
 
 		# Return album (list)
-		return old_artist_albums
+		return oldArtistAlbums
 
 	def scanMusicDirectory(self):
 
 		# OBJECTIVE: Fetch all music inside the device
 
 		# Get full path of Music folder
-		starting_dir = "{}/Music".format(os.environ["HOME"])
+		startingDir = "{}/Music".format(os.environ["HOME"])
 
 		# Hold name of directories last visited
-		old_artist = ""
-		old_artist_albums = list()
+		oldArtist = ""
+		oldArtistAlbums = list()
 
 		while True:
 
 			# Get directories and files inside Music directory
 			# string, list, list in os.walk(starting_dir)
 			# NOTE: topdown=True allows os.walk() to go to the bottom of the directory before going to any other
-			for directory, sub_directory, filename in os.walk(starting_dir, topdown=True):
+			for directory, subDirectory, filename in os.walk(startingDir, topdown=True):
 
 				print("Directory: {}".format(directory))
-				print("Subdirectory: {}".format(sub_directory))
+				print("Subdirectory: {}".format(subDirectory))
 				print("filename: {}".format(filename))
 
 				try:
 					# Split directory with "/" as denominator and slice it
-					directory_list = directory.split("/")[4:]
+					directoryList = directory.split("/")[4:]
 
 					# Get album and song name from list
-					artist = directory_list[0]
-					album = directory_list[1]
+					artist = directoryList[0]
+					album = directoryList[1]
 					print("Artist: {}".format(artist))
 					print("Album: {}".format(album))
 
@@ -437,34 +432,34 @@ class MusicLibrary:
 					# If exception wasn't raised, execute code below
 
 					# If this is the 1st iteration, add artist to old_artist
-					if old_artist == "":
+					if oldArtist == "":
 						print("1st iteration, so I'll manually set 'old_artist' to 'artist'")
-						old_artist = artist
+						oldArtist = artist
 
 					# If old_artist == artist, then we haven't changed singers, so there must be more albums
-					if old_artist == artist:
+					if oldArtist == artist:
 						print("'old_artist' and 'artist' match!")
-						old_artist_albums = self.addSongsToDictionary(album, sub_directory, filename, old_artist_albums)
+						oldArtistAlbums = self.addSongsToDictionary(album, subDirectory, filename, oldArtistAlbums)
 
 					# If old_artist != artist, then we already have all the songs from "old_artist" and need to add a new "artist"
-					if old_artist != artist:
+					if oldArtist != artist:
 						print("'old_artist' and 'artist' DON'T match!")
 
 						# Add old_artist with old_artist_albums to final dictionary
-						self.music_library_dict[old_artist] = copy.deepcopy(old_artist_albums)
+						self.musicLibraryDict[oldArtist] = copy.deepcopy(oldArtistAlbums)
 						# print("Music Library: {}".format(self.music_library))
 
 						# Update variables
-						old_artist = artist
-						old_artist_albums = []
+						oldArtist = artist
+						oldArtistAlbums = []
 
-						old_artist_albums = self.addSongsToDictionary(album, sub_directory, filename, old_artist_albums)
+						oldArtistAlbums = self.addSongsToDictionary(album, subDirectory, filename, oldArtistAlbums)
 
 				print()
 
 			# Once for-loop ends, save last record of artist's songs and albums
 			# Add old_artist with old_artist_albums to final dictionary
-			self.music_library_dict[old_artist] = copy.deepcopy(old_artist_albums)
+			self.musicLibraryDict[oldArtist] = copy.deepcopy(oldArtistAlbums)
 			# print("Music Library: {}".format(self.music_library))
 
 			# Exit while-loop
