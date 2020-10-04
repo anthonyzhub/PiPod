@@ -21,9 +21,7 @@ def entryMsg(location):
 	print("\n{}\nWindow: {}\n{}\n".format("=" * 20, location, "=" * 20))
 
 def music(music_class):
-	entryMsg("Music Library")
-	# music_class.printDictionary()
-	music_class.printMusicLibrary()
+	music_class.showMusicLibraryWindow()
 
 def photos():
 	entryMsg("Photo Library")
