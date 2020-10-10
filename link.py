@@ -1,16 +1,27 @@
 class Node:
 
-	def __init__(self, data):
+	def __init__(self, data="0"):
 		self.next = None
+		self.prev = None
 		self.data = data
+
+	def printInfo(self):
+
+		# OBJECTIVE: Print all informaiton about this node
+		print("Node:\n\tData: {}\n\tAddress: {}\n\tPrev: {}\n\tNext: {}".format(self.data, self, self.prev, self.next))
+
+	def printDataOnly(self):
+
+		# OBJECTIVE: Only print the node's data
+		print("Node:\n\tData: {}".format(self.data))
 
 class LinkList:
 
 	def __init__(self):
 
 		# Create a head and tail node
-		self.head = None
-		self.tail = None
+		self.head = Node()
+		self.tail = Node()
 
 		# Create counter of list size
 		self.size = 0
@@ -26,12 +37,15 @@ class LinkList:
 		# OBJECTIVE: If list is empty, immediately add a head
 
 		# Create a new node
-		newNode = Node(data)
-		newNode.next = None
+		newHead = Node(data)
 
-		# Update head node
-		self.head = newNode
-		self.tail = newNode
+		# Update head and tail node
+		self.head = newHead
+		self.tail = newHead
+
+		print("Adding head node")
+		self.head.printInfo()
+		self.tail.printInfo()
 
 		# Update counter
 		self.size += 1
@@ -45,15 +59,16 @@ class LinkList:
 			self.addHead(data)
 			return None
 
+		# Get head node
+		currNode = self.head
+		while currNode.next != None:
+			currNode = currNode.next
+
 		# Create a new node
 		newNode = Node(data)
-		newNode.next = None
+		newNode.prev = currNode
+		currNode.next = newNode
 
-		# Get last node
-		lastNode = self.tail
-		lastNode.next = newNode
-
-		# Update last node
 		self.tail = newNode
 
 		# Update counter
@@ -67,37 +82,22 @@ class LinkList:
 		if self.isEmpty():
 			return None
 
-		# Delete head
-		if pos == 1:
+		# Get head node
+		currNode = self.head
 
-			# Get the first 2 nodes
-			oldHead = self.head
-			newHead = oldHead.next
+		# Delete node at Nth position
+		for _ in range(pos - 1):
+			currNode = currNode.next
 
-			# Update head and old node
-			self.head = newHead
-			del oldHead
+		# Relink nodes surrounding currNode
+		currNode.prev.next = currNode.next
+		currNode.next.prev = currNode.prev
 
-		elif pos > 1 and pos <= self.size:
-			
-			# Iterate link list until position is met
-			currNode = self.head
-			oldNode = currNode
+		# Delete currNode
+		del durrNode
 
-			for _ in range(pos - 1):
-				oldNode = currNode
-				currNode = currNode.next
-
-			# Update references and remove node
-			oldNode.next = currNode.next
-			del currNode
-
-			# Update counter
-			self.size -= 1
-
-		else:
-
-			return False
+		return True
+		
 
 	def getHead(self):
 
@@ -147,9 +147,13 @@ class LinkList:
 		if linkListA.data <= linkListB.data:
 			newHead = linkListA
 			newHead.next = self.sortedMerge(linkListA.next, linkListB)
+			newHead.next.prev = newHead # Point the next node to newHead
+			newHead.prev = None
 		else:
 			newHead = linkListB
 			newHead.next = self.sortedMerge(linkListA, linkListB.next)
+			newHead.next.prev = newHead # Point the next node to newHead
+			newHead.prev = None
 
 		# Return head sorted link list
 		return newHead
@@ -181,18 +185,25 @@ class LinkList:
 	def printLinkList(self):
 
 		# OBJECTIVE: Print all nodes inside link list
+		
+		# Stop if link list is emtpy
+		if self.size <= 0:
+			print("Link list is emtpy")
+			return None
 
+		# Print link list in normal order
 		# Get head node
-		curr_node = self.head
+		currNode = self.head
 
 		# Iterate link list with counter
 		counter = 1
 		
 		print()
-		while curr_node != None:
-			print("{}. {}".format(counter, curr_node.data))
+		while currNode != None:
+			# currNode.printInfo() # NOTE: <= For debugging purposes
+			print("{}. {}".format(counter, currNode.data)) # NOTE: <= For commercial use
 
-			curr_node = curr_node.next
+			currNode = currNode.next
 			counter += 1
 		print()
 

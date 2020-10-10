@@ -47,8 +47,8 @@ class MusicLibrary:
 
 		# Create a link list of all the music in sorted order
 		self.finalMusicLinkList = LinkList()
-		self.finalMusicLinkList.size = self.totalSongs # Manually enter link list size
 		self.organizeMusicLibrary()
+		self.finalMusicLinkList.size = self.totalSongs # Manually enter link list size
 
 	def entryMsg(self, location):
 
@@ -78,25 +78,41 @@ class MusicLibrary:
 			if headA == None:
 				# print("head_a is empty!")
 				tailNode.next = headB
+				headB.prev = tailNode
 				break
 
 			if headB == None:
 				# print("head_b is empty!")
 				tailNode.next = headA
+				headA.prev = tailNode
 				break
 
 			# Compare nodes from both link list to see which goes first in sorted order
 			if headA.data <= headB.data:
 				# print("Adding head_a as next node")
+
+				# Update pointers
 				tailNode.next = headA
+				headA.prev = tailNode
+
+				# Update headA
 				headA = headA.next
 			else:
 				# print("Adding head_b as next node")
+
+				# Update pointers
 				tailNode.next = headB
+				headB.prev = tailNode
+
+				# Update headB
 				headB = headB.next
 
 			# Update tail node
 			tailNode = tailNode.next
+
+		# Delete prev pointer in head link list
+		# NOTE: Prev pointer still points to dummyNode after function ends
+		dummyNode.next.prev = None
 
 		# Return head of merged link list
 		return dummyNode.next
