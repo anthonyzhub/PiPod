@@ -1,7 +1,6 @@
 #! /usr/bin/python3
 
-# Import libraries
-#from tkinter import *
+# from tkinter import *
 
 # Import classes
 from music import MusicLibrary
@@ -10,18 +9,13 @@ from music import MusicLibrary
 WIN_WIDTH = 240
 WIN_HEIGHT = 240
 
-def musicWindow():
-
-	# OBJECTIVE: Open a new window with a list of songs
-	print("Music window is open")
-
-	music_library = MusicLibrary(WIN_WIDTH, WIN_HEIGHT)
-
 def entryMsg(location):
 	print("\n{}\nWindow: {}\n{}\n".format("=" * 20, location, "=" * 20))
 
-def music(music_class):
-	music_class.showMusicLibraryWindow()
+def music():
+
+	# Show music library
+	musicClass.showMusicLibraryWindow()
 
 def photos():
 	entryMsg("Photo Library")
@@ -41,18 +35,32 @@ def shuffle():
 if __name__ == "__main__":
 
 	"""
-	# Initialize tkinter() 
+	# Initialize tkinter()
 	root = Tk()
 
 	# Create a 240x240 window (dimensions comes from adafruit screen)
 	root.geometry("{}x{}".format(WIN_WIDTH, WIN_HEIGHT))
 
-	# Create a "Music" button to show user's music
-	music_btn = Button(root, text="Music", command=music_window)
-	music_btn.place(x=0, y=0, height=25, width=WIN_WIDTH)
+	# Create and layout buttons
+	musicBtn = Button(root, text="Music", command=music)
+	photosBtn = Button(root, text="Photos", command=photos)
+	videosBtn = Button(root, text="Videos", command=videos)
+	extrasBtn = Button(root, text="Extras", command=extras)
+	shuffleBtn = Button(root, text="Shuffle", command=shuffle)
+	settingsBtn = Button(root, text="Settings", command=settings)
+
+	musicBtn.place(x=0, y=0, height=BTN_HEIGHT, width=WIN_WIDTH)
+	photosBtn.place(x=0, y=BTN_HEIGHT, height=BTN_HEIGHT, width=WIN_WIDTH)
+	videosBtn.place(x=0, y=BTN_HEIGHT * 2, height=BTN_HEIGHT, width=WIN_WIDTH)
+	extrasBtn.place(x=0, y=BTN_HEIGHT * 3, height=BTN_HEIGHT, width=WIN_WIDTH)
+	shuffleBtn.place(x=0, y=BTN_HEIGHT * 4, height=BTN_HEIGHT, width=WIN_WIDTH)
+	settingsBtn.place(x=0, y=BTN_HEIGHT * 5, height=BTN_HEIGHT, width=WIN_WIDTH)
 
 	# Display window with all widgets
 	root.mainloop()
+	
+	# Initialize MusicLibrary
+	musicClass = MusicLibrary(WIN_WIDTH, WIN_HEIGHT)
 	"""
 
 	# Initialize MusicLibrary
@@ -92,3 +100,4 @@ if __name__ == "__main__":
 				exit(1)
 			else:
 				print("Invalid option!")
+	"""

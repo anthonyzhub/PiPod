@@ -1,5 +1,6 @@
 
 from tkinter import *
+from playsound import playsound
 import os
 import copy
 
@@ -10,18 +11,30 @@ class MusicLibrary:
 	"""
 	def __init__(self, WIN_WIDTH, WIN_HEIGHT):
 
+		# NOTE: This init() is for GUI use
+
 		# Create a new window
-		self.music_win = Toplevel()
-		self.music_win.geometry("{}x{}".format(WIN_WIDTH, WIN_HEIGHT))
-		self.music_win.title("Music Library")
+		self.musicWindow = Toplevel()
+		self.musicWindow.geometry("{}x{}".format(WIN_WIDTH, WIN_HEIGHT))
+		self.musicWindow.title("Music Library")
 
 		# Create a dictionary dedicated to artist
-		self.music_library = dict()
+		self.musicLibraryDict = dict()
 
-		# Immediately call function to collect device's songs
-		self.get_music()
+		# Gather all songs inside the device and add them to self.musicLibraryDict{}
+		self.totalSongs = 0
+		self.scanMusicDirectory()
+
+		# Create a link list of all the music in sorted order
+		self.finalMusicLinkList = LinkList()
+		self.organizeMusicLibrary()
+		self.finalMusicLinkList.size = self.totalSongs # Manually enter link list size
+
+		# Create a scrollable list
+		self.listBox = Listbox(self.musicWindow, selectmode=BROWSE) # <= BROWSE allows the user to scroll the list and only select 1 item
+		self.listBox.pack()
+		self.populateListBox()
 	"""
-
 	"""
 	NOTE: music_library structure:
 
@@ -35,8 +48,10 @@ class MusicLibrary:
 
 
 	"""
-
+	
 	def __init__(self):
+
+		# NOTE: This init() is for command line use
 
 		# Create a dictionary dedicated to artist
 		self.musicLibraryDict = dict()
