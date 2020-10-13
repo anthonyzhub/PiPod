@@ -12,7 +12,7 @@ WIN_HEIGHT = 240
 def entryMsg(location):
 	print("\n{}\nWindow: {}\n{}\n".format("=" * 20, location, "=" * 20))
 
-def music():
+def music(musicClass):
 
 	# Show music library
 	musicClass.showMusicLibraryWindow()
@@ -100,4 +100,3 @@ if __name__ == "__main__":
 				exit(1)
 			else:
 				print("Invalid option!")
-	"""

@@ -1,6 +1,6 @@
 class Node:
 
-	def __init__(self, data="0"):
+	def __init__(self, data=None):
 		self.next = None
 		self.prev = None
 		self.data = data
@@ -27,10 +27,10 @@ class LinkList:
 		self.size = 0
 
 	def getHead(self):
+		return self.head.next
 
-		# OBJECTIVE: Return memory address of head node
-
-		return self.head
+	def getTail(self):
+		return self.tail.prev
 
 	def getMiddleNode(self, headNode):
 
@@ -67,7 +67,7 @@ class LinkList:
 			return 
 
 		# Skip to node at specified position
-		currNode = self.head
+		currNode = self.getHead()
 		for _ in range(pos-1):
 			currNode = currNode.next
 
@@ -75,9 +75,6 @@ class LinkList:
 		return currNode.data
 
 	def isEmpty(self):
-
-		# OBJECTIVE: Check if link list is empty
-
 		return self.size == 0
 
 	def addHead(self, data):
@@ -85,15 +82,15 @@ class LinkList:
 		# OBJECTIVE: If list is empty, immediately add a head
 
 		# Create a new node
-		newHead = Node(data)
+		newNode = Node(data)
+
+		# Update newNode
+		newNode.next = self.tail
+		newNode.prev = self.head
 
 		# Update head and tail node
-		self.head = newHead
-		self.tail = newHead
-
-		print("Adding head node")
-		self.head.printInfo()
-		self.tail.printInfo()
+		self.head.next = newNode
+		self.tail.prev = newNode
 
 		# Update counter
 		self.size += 1
@@ -105,19 +102,16 @@ class LinkList:
 		# Check if link list is empty
 		if self.isEmpty():
 			self.addHead(data)
-			return None
-
-		# Get head node
-		currNode = self.head
-		while currNode.next != None:
-			currNode = currNode.next
+			return
 
 		# Create a new node
 		newNode = Node(data)
-		newNode.prev = currNode
-		currNode.next = newNode
+		newNode.next = self.tail
+		newNode.prev = self.tail.prev
 
-		self.tail = newNode
+		# Update tail node pointers
+		self.tail.prev.next = newNode
+		self.tail.prev = newNode
 
 		# Update counter
 		self.size += 1
@@ -131,7 +125,7 @@ class LinkList:
 			return None
 
 		# Get head node
-		currNode = self.head
+		currNode = self.getHead()
 
 		# Delete node at Nth position
 		for _ in range(pos - 1):
@@ -153,10 +147,11 @@ class LinkList:
 		newHead = None
 
 		# Check if either halves of the list are none
-		if linkListA == None:
+		# If data is none, then it must be a tail
+		if linkListA == None or linkListA.data == None:
 			return linkListB
 
-		if linkListB == None:
+		if linkListB == None or linkListB.data == None:
 			return linkListA
 
 		# Make a recursive call, divide called link list, and come back here
@@ -184,7 +179,7 @@ class LinkList:
 
 		# Get middle node
 		middleNode = self.getMiddleNode(headNode)
-		node_after_middle = middleNode.next
+		nodeAfterMiddle = middleNode.next
 
 		# Set pointer from middle_node to next node as None
 		# NOTE: By setting next as none, middle_node would be the end of the link list
@@ -192,11 +187,33 @@ class LinkList:
 
 		# Sort left and right side of link list
 		leftSide = self.mergeSort(headNode)
-		rightSide = self.mergeSort(node_after_middle)
+		rightSide = self.mergeSort(nodeAfterMiddle)
 
 		# Merge both sides of the link list to one in sorted order.
 		# The return value of sortedMerge() is the head node of the new link list
 		return self.sortedMerge(leftSide, rightSide)
+
+	def printForward(self):
+
+		# Get head node
+		currNode = self.getHead()
+
+		# Iterate link list
+		# while currNode.next != None:
+		while currNode != None:
+			print(currNode.data)
+			currNode = currNode.next
+
+	def printBackwards(self):
+
+		# Get head node
+		currNode = self.getTail()
+
+		# Iterate link list
+		# while currNode.prev != None:
+		while currNode != None:
+			print(currNode.data)
+			currNode = currNode.prev
 
 	def printLinkList(self):
 
@@ -209,7 +226,7 @@ class LinkList:
 
 		# Print link list in normal order
 		# Get head node
-		currNode = self.head
+		currNode = self.getHead()
 
 		# Iterate link list with counter
 		counter = 1
