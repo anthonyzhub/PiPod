@@ -4,33 +4,35 @@ class Node:
 		self.next = None
 		self.prev = None
 		self.data = data
+		self.pos = None
 
 	def printInfo(self):
 
 		# OBJECTIVE: Print all informaiton about this node
-		print("Node:\n\tData: {}\n\tAddress: {}\n\tPrev: {}\n\tNext: {}".format(self.data, self, self.prev, self.next))
 
-	def printDataOnly(self):
-
-		# OBJECTIVE: Only print the node's data
-		print("Node:\n\tData: {}".format(self.data))
+		print("Node:")
+		print("\tPos: ", self.pos)
+		print("\tData: ", self.data)
+		print("\tAddress: ", self)
+		print("\tPrev: ", self.prev)
+		print("\tNext: ", self.next)
 
 class LinkList:
 
 	def __init__(self):
 
 		# Create a head and tail node
-		self.head = Node()
-		self.tail = Node()
+		self.head = None
+		self.tail = None
 
 		# Create counter of list size
 		self.size = 0
 
 	def getHead(self):
-		return self.head.next
+		return self.head
 
 	def getTail(self):
-		return self.tail.prev
+		return self.tail
 
 	def getMiddleNode(self, headNode):
 
@@ -84,37 +86,49 @@ class LinkList:
 		# Create a new node
 		newNode = Node(data)
 
-		# Update newNode
-		newNode.next = self.tail
-		newNode.prev = self.head
-
 		# Update head and tail node
-		self.head.next = newNode
-		self.tail.prev = newNode
+		self.head = newNode
+		self.tail = newNode
 
-		# Update counter
+		# Update size
 		self.size += 1
+		newNode.pos = self.size
 
 	def addNode(self, data):
 
 		# OBJECTIVE: Add a new node to the end of the list
 
-		# Check if link list is empty
+		# Add head if node is empty
 		if self.isEmpty():
 			self.addHead(data)
 			return
 
+		if self.size == 1:
+
+			# Create a new node
+			newNode = Node(data)
+
+			# Update head's pointers
+			self.head.next = newNode
+			newNode.prev = self.head
+
+			# Update tail node
+			self.tail = newNode
+
+			# Update size
+			self.size += 1
+			newNode.pos = self.size
+			
+			return
+
 		# Create a new node
 		newNode = Node(data)
-		newNode.next = self.tail
-		newNode.prev = self.tail.prev
+		self.tail.next = newNode
+		newNode.prev = self.tail
+		self.tail = newNode
 
-		# Update tail node pointers
-		self.tail.prev.next = newNode
-		self.tail.prev = newNode
-
-		# Update counter
 		self.size += 1
+		newNode.pos = self.size
 
 	def deleteNode(self, pos):
 
@@ -137,6 +151,25 @@ class LinkList:
 
 		# Delete currNode
 		del durrNode
+
+		return True
+
+	def deleteLinkList(self):
+
+		# OBJECTIVE: Delete the entire link list including head and tail nodes
+
+		# Get head node
+		currNode = self.head
+
+		while currNode != None:
+
+			# Copy node and go to next node
+			oldNode = currNode
+			currNode = currNode.next
+
+			# Delete oldNode and decrement size
+			del oldNode
+			self.size -= 1
 
 		return True
 
@@ -181,7 +214,7 @@ class LinkList:
 		middleNode = self.getMiddleNode(headNode)
 		nodeAfterMiddle = middleNode.next
 
-		# Set pointer from middle_node to next node as None
+		# Set pointer from middleNode to next node as None
 		# NOTE: By setting next as none, middle_node would be the end of the link list
 		middleNode.next = None
 
@@ -193,16 +226,49 @@ class LinkList:
 		# The return value of sortedMerge() is the head node of the new link list
 		return self.sortedMerge(leftSide, rightSide)
 
+	def binarySearch(self, leftNode, rightNode, pos):
+
+		# OBJECTIVE: Find data in link list with binary search
+
+		# Exit, if either nodes are none
+		if (leftNode == None) or (rightNode == None):
+			print("Either nodes are empty")
+			exit()
+
+		# Exit, if leftNode and rightNode overlap
+		if (leftNode.pos >= rightNode.pos):
+			print("Nodes are overlapping")
+			return False
+
+		# Get middle node
+		middleNode = self.getMiddleNode(leftNode) # Start from the far left
+		nodeAfterMiddle = middleNode.next
+
+		middleNode.next = None
+
+		# Check if middleNode is at position
+		if middleNode.pos == pos:
+			return middleNode.data
+
+		# Go to right half
+		elif middleNode.pos > pos:
+			return self.binarySearch(leftNode, rightNode.prev, pos)
+
+		# Go to left half
+		elif middleNode.pos < pos:
+			return self.binarySearch(middleNode.next, rightNode, pos)
+
 	def printForward(self):
 
 		# Get head node
 		currNode = self.getHead()
 
 		# Iterate link list
-		# while currNode.next != None:
+		counter = 1
 		while currNode != None:
-			print(currNode.data)
+			print("{}. {}".format(counter, currNode.data))
 			currNode = currNode.next
+			counter += 1
 
 	def printBackwards(self):
 
@@ -210,32 +276,19 @@ class LinkList:
 		currNode = self.getTail()
 
 		# Iterate link list
-		# while currNode.prev != None:
+		counter = 1
 		while currNode != None:
-			print(currNode.data)
+			print("{}. {}".format(counter, currNode.data))
 			currNode = currNode.prev
+			counter += 1
 
-	def printLinkList(self):
+	def printLinkListData(self):
 
-		# OBJECTIVE: Print all nodes inside link list
-		
-		# Stop if link list is emtpy
-		if self.size <= 0:
-			print("Link list is emtpy")
-			return None
+		# OBJECTIVE: Print data of each node inside link list
 
-		# Print link list in normal order
-		# Get head node
+		# Get head
 		currNode = self.getHead()
 
-		# Iterate link list with counter
-		counter = 1
-		
-		print()
 		while currNode != None:
-			# currNode.printInfo() # NOTE: <= For debugging purposes
-			print("{}. {}".format(counter, currNode.data)) # NOTE: <= For commercial use
-
+			currNode.printInfo()
 			currNode = currNode.next
-			counter += 1
-		print()

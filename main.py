@@ -29,8 +29,10 @@ def extras():
 def settings():
 	entryMsg("Settings")
 
-def shuffle():
+def shuffle(musicClass):
 	entryMsg("Music Player")
+	musicClass.shuffleMusic()
+
 
 if __name__ == "__main__":
 
@@ -71,7 +73,7 @@ if __name__ == "__main__":
 	while True:
 
 		# Print menu
-		print("1. Music\n2. Photos\n3. Videos\n4. Extras\n5. Settings\n6. Shuffle Songs\n-1. Quit")
+		print("\n1. Music\n2. Photos\n3. Videos\n4. Extras\n5. Settings\n6. Shuffle Songs\n-1. Quit")
 
 		try:
 			option = int(input("\nSelect: "))
@@ -95,7 +97,7 @@ if __name__ == "__main__":
 			elif option == 5:
 				settings()
 			elif option == 6:
-				shuffle()
+				shuffle(musicClass)
 			elif option == -1:
 				exit(1)
 			else:

@@ -3,6 +3,7 @@ from tkinter import *
 from playsound import playsound
 import os
 import copy
+import random
 
 from link import LinkList, Node
 
@@ -76,63 +77,61 @@ class MusicLibrary:
 
 		# OBJECTIVE: Print a custom message if an exception or error rises
 		print("ERROR: {}".format(msg))
+
+	def addNodes(self, newLinkList, headA):
+
+		# OBJECTIVE: Add remaining nodes to from old link list to newLinkList
+
+		print("Adding remaining nodes")
+
+		while headA != None:
+			newLinkList.addNode(headA.data)
+			# print(headA.data)
+			headA = headA.next
+
+		return newLinkList
 		
-	def mergeTwoSortedLinkList(self, headA, headB=None):
+	def mergeTwoSortedLinkList(self, headA, headB):
 		
 		# OBJECTIVE: Merge 2 sorted link list to one by calling functions from LinkList class
 		# link: https://www.geeksforgeeks.org/merge-sort-for-linked-list/
 
-		# Create a dummy node
-		dummyNode = Node()
+		# Create a new link list
+		newLinkList = LinkList()
 
-		# Create a tail node referencing to dummy node
-		tailNode = dummyNode
 		while True:
 
 			# If either link list is empty, add all elements from the other link list
 			if headA == None:
-				# print("head_a is empty!")
-				tailNode.next = headB
-				headB.prev = tailNode
+				newLinkList = self.addNodes(newLinkList, headB)
 				break
 
 			if headB == None:
-				# print("head_b is empty!")
-				tailNode.next = headA
-				headA.prev = tailNode
+				newLinkList = self.addNodes(newLinkList, headA)
 				break
 
 			# Compare nodes from both link list to see which goes first in sorted order
 			if headA.data <= headB.data:
-				# print("Adding head_a as next node")
-				# print("Adding headA: {}".format(headA.data))
+
+				print("Adding A ")
 
 				# Update pointers
-				tailNode.next = headA
-				headA.prev = tailNode
+				newLinkList.addNode(headA.data)
 
 				# Update headA
 				headA = headA.next
+
 			else:
-				# print("Adding head_b as next node")
-				# print("Adding headB: {}".format(headB.data))
+
+				print("Adding B ")
 
 				# Update pointers
-				tailNode.next = headB
-				headB.prev = tailNode
+				newLinkList.addNode(headB.data)
 
 				# Update headB
 				headB = headB.next
 
-			# Update tail node
-			tailNode = tailNode.next
-
-		# Delete prev pointer in head link list
-		# NOTE: Prev pointer still points to dummyNode after function ends
-		dummyNode.next.prev = None
-
-		# Return head of merged link list
-		return dummyNode.next
+		return newLinkList
 
 	def musicPlayerWindow(self, songPlaying):
 
@@ -164,6 +163,34 @@ class MusicLibrary:
 			# Print selected option
 			print(option)
 
+	def shuffleMusic(self):
+
+		# OBJECTIVE: Pick a random number and play song at selected position
+
+		# Create a new link list
+		shuffleLinkList = LinkList()
+
+		# Create a set filled with random numbers
+		# NOTE: Sets don't allow duplicates
+		randomNumbers = list()
+
+		while len(randomNumbers) < self.totalSongs:
+			r = random.randint(1, self.totalSongs)
+
+			if r not in randomNumbers:
+				randomNumbers.append(r)
+
+		print(self.finalMusicLinkList.getHead().data)
+		print(self.finalMusicLinkList.getTail())
+		return
+		# Use binary search on self.finalMusicLinkList to add elements to shuffleLinkList
+		for num in randomNumbers:
+			tmp = self.finalMusicLinkList.binarySearch(self.finalMusicLinkList.getHead(), self.finalMusicLinkList.getTail(), num)
+			shuffleLinkList.addNode(tmp)
+
+		del randomNumbers
+		shuffleLinkList.printForward()
+
 	def showMusicLibraryWindow(self):
 
 		# OBJECTIVE: List all songs inside the device onto the window in alphabetical order
@@ -174,23 +201,24 @@ class MusicLibrary:
 
 			# Print music library
 			self.entryMsg("Music Library")
-			# self.finalMusicLinkList.printForward()
-			self.finalMusicLinkList.printBackwards()
+			self.finalMusicLinkList.printForward()
+			# self.finalMusicLinkList.printBackwards()
+			# self.finalMusicLinkList.printLinkListData()
 
 			# Raise exception if musicSelected cannot cast to int
 			try:
-				musicSelected = int(input("Play song #: "))
+				musicSelected = int(input("\nPlay song #: "))
 			except:
 				self.errorMsg("Numbers only!")
 			else:
 
 				# Skip to next iteration, if invalid entry was entered
-				if (musicSelected > self.finalMusicLinkList.size) or (musicSelected == 0):
-					self.errorMsg("Invalid entry!")
-					continue
-
 				if musicSelected == -1:
 					return
+				
+				if (musicSelected > self.finalMusicLinkList.size) or (musicSelected <= 0):
+					self.errorMsg("Invalid entry!")
+					continue
 
 				# Get song from nth position
 				musicSelected = self.finalMusicLinkList.dataAtPosition(musicSelected)
@@ -216,18 +244,14 @@ class MusicLibrary:
 				headNodesList.append(currHead)
 
 		# Iterate headNodesList
-		oldHead = headNodesList[0] # <= Get 1st element from list
-		for pos in range(1, len(headNodesList)):
+		newLinkList = LinkList()
+		for pos in range(0, len(headNodesList)):
 
-			# print("head_nodes_list[pos]: {}".format(headNodesList[pos]))
-
-			# Merge head of 2 link lists together in sorted order. Return value will be head of new link list
-			oldHead = self.mergeTwoSortedLinkList(oldHead, headNodesList[pos])
-
+			# Merge 2 link lists and return a new one
+			newLinkList = self.mergeTwoSortedLinkList(newLinkList.getHead(), headNodesList[pos].getHead())
+			
 		# Update final link list's head
-		self.finalMusicLinkList.head.next = oldHead
-		# self.finalMusicLinkList.printForward()
-		# self.finalMusicLinkList.printBackwards() BUG: 'NoneType' object has no attribute 'prev'
+		self.finalMusicLinkList = newLinkList
 
 	def printMusicDictionary(self):
 
@@ -252,7 +276,6 @@ class MusicLibrary:
 				print("\tAlbum: {}".format(albumName))
 				print("\tSongs:")
 
-				# while albumNode.next != None:
 				while albumNode != None:
 					print("\t\t{}".format(albumNode.data))
 					albumNode = albumNode.next
@@ -276,7 +299,7 @@ class MusicLibrary:
 				ll.addNode(song)
 
 			# Sort link list
-			ll.head.next = ll.mergeSort(ll.getHead())
+			ll.head = ll.mergeSort(ll.getHead())
 			# ll.printForward()
 			# ll.printBackwards()
 
@@ -285,7 +308,8 @@ class MusicLibrary:
 
 			# Save album and songs as a dictionary to the list
 			# Ex. {album name: link list}
-			oldArtistAlbumsList.append({albumNameStr: ll.getHead()})
+			# oldArtistAlbumsList.append({albumNameStr: ll.getHead()})
+			oldArtistAlbumsList.append({albumNameStr: ll}) # NOTE: Save instance of LinkList
 			# print("Added '{}' with '{}' as head node to 'old_artist_albums'!".format(albumName, ll.getHead().data))
 
 		# Return album (list)
@@ -364,4 +388,4 @@ class MusicLibrary:
 			# Exit while-loop
 			break
 
-		self.printMusicDictionary()
+		# self.printMusicDictionary()
