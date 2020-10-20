@@ -78,11 +78,11 @@ class MusicLibrary:
 		# OBJECTIVE: Print a custom message if an exception or error rises
 		print("ERROR: {}".format(msg))
 
-	def addNodes(self, newLinkList, headA):
+	def addRemainingNodes(self, newLinkList, headA):
 
 		# OBJECTIVE: Add remaining nodes to from old link list to newLinkList
 
-		print("Adding remaining nodes")
+		# print("Adding remaining nodes")
 
 		while headA != None:
 			newLinkList.addNode(headA.data)
@@ -103,17 +103,17 @@ class MusicLibrary:
 
 			# If either link list is empty, add all elements from the other link list
 			if headA == None:
-				newLinkList = self.addNodes(newLinkList, headB)
+				newLinkList = self.addRemainingNodes(newLinkList, headB)
 				break
 
 			if headB == None:
-				newLinkList = self.addNodes(newLinkList, headA)
+				newLinkList = self.addRemainingNodes(newLinkList, headA)
 				break
 
 			# Compare nodes from both link list to see which goes first in sorted order
 			if headA.data <= headB.data:
 
-				print("Adding A ")
+				# print("Adding A ")
 
 				# Update pointers
 				newLinkList.addNode(headA.data)
@@ -123,7 +123,7 @@ class MusicLibrary:
 
 			else:
 
-				print("Adding B ")
+				# print("Adding B ")
 
 				# Update pointers
 				newLinkList.addNode(headB.data)
@@ -133,77 +133,104 @@ class MusicLibrary:
 
 		return newLinkList
 
-	def musicPlayerWindow(self, songPlaying):
+	def playSongFromLinkList(self, selectedLinkList):
 
-		# OBJECTIVE: Open a new window when a song has been selected
+		# OBJECTIVE: Open a new window when a song has been selected from a link list
 
 		# Print song being played
 		self.entryMsg("Music Player")
 
-		# Show options to go skip, rewind, pause, play, and go back to previous window
-		while True:
+		# Get head node
+		currNode = selectedLinkList.getHead()
+
+		# While currNode isn't none, continue to show playSongFromLinkList
+		# Exit function once currNode is none
+		while currNode != None:
 
 			# Print what song is playing and what options are available
-			print("\nNow Playing: {}".format(songPlaying))
+			print("\nNow Playing: {}".format(currNode.data))
 			option = input("< |>| > -1: ")
 
 			# Narrow down options
 			if option == "<":
-				option = "Rewind song or going to previous song"
+				currNode = currNode.prev
 			elif option == "|>|":
 				option = "Pause/Play"
 			elif option == ">":
-				option = "Next song"
+				currNode = currNode.next
 			elif option == "-1":
 				return
 			else:
 				self.errorMsg("Invalid entry!")
 				continue
 
-			# Print selected option
-			print(option)
+	def playSongFromSortedLinkList(self, selectedNode):
+
+		# OBJECTIVE: Open a new window when a song has been selected
+
+		# Print song being played
+		self.entryMsg("Music Player")
+
+		# While currNode isn't none, continue to show playSongFromLinkList
+		# Exit function once currNode is none
+		while selectedNode != None:
+
+			# Print what song is playing and what options are available
+			print("\nNow Playing: {}".format(selectedNode.data))
+			option = input("< |>| > -1: ")
+
+			# Narrow down options
+			if option == "<":
+				selectedNode = selectedNode.prev
+			elif option == "|>|":
+				option = "Pause/Play"
+			elif option == ">":
+				selectedNode = selectedNode.next
+			elif option == "-1":
+				return
+			else:
+				self.errorMsg("Invalid entry!")
+				continue
 
 	def shuffleMusic(self):
 
 		# OBJECTIVE: Pick a random number and play song at selected position
 
-		# Create a new link list
-		shuffleLinkList = LinkList()
+		print("Shuffling music")
 
-		# Create a set filled with random numbers
-		# NOTE: Sets don't allow duplicates
+		# Create a list filled with random numbers
 		randomNumbers = list()
 
-		while len(randomNumbers) < self.totalSongs:
-			r = random.randint(1, self.totalSongs)
+		while len(randomNumbers) != self.finalMusicLinkList.size:
+
+			# Generate a unique random number and add it to list
+			r = random.randint(1, self.finalMusicLinkList.size)
 
 			if r not in randomNumbers:
 				randomNumbers.append(r)
 
-		print(self.finalMusicLinkList.getHead().data)
-		print(self.finalMusicLinkList.getTail())
-		return
-		# Use binary search on self.finalMusicLinkList to add elements to shuffleLinkList
-		for num in randomNumbers:
-			tmp = self.finalMusicLinkList.binarySearch(self.finalMusicLinkList.getHead(), self.finalMusicLinkList.getTail(), num)
-			shuffleLinkList.addNode(tmp)
+		# Add data in Nth position to shuffle link list
+		newLinkList = LinkList()
+		for pos in randomNumbers:
+			result = self.finalMusicLinkList.binarySearchForPosition(self.finalMusicLinkList.getHead(), self.finalMusicLinkList.getTail(), pos)
+			newLinkList.addNode(result)
 
+		# Delete list and sent link list to playSongFromLinkList()
 		del randomNumbers
-		shuffleLinkList.printForward()
+		self.playSongFromLinkList(newLinkList)
 
 	def showMusicLibraryWindow(self):
 
 		# OBJECTIVE: List all songs inside the device onto the window in alphabetical order
+
+		self.entryMsg("Music Library")
 
 		# Select music to play
 		print("Enter -1 to go back")
 		while True:
 
 			# Print music library
-			self.entryMsg("Music Library")
 			self.finalMusicLinkList.printForward()
-			# self.finalMusicLinkList.printBackwards()
-			# self.finalMusicLinkList.printLinkListData()
 
 			# Raise exception if musicSelected cannot cast to int
 			try:
@@ -221,8 +248,9 @@ class MusicLibrary:
 					continue
 
 				# Get song from nth position
-				musicSelected = self.finalMusicLinkList.dataAtPosition(musicSelected)
-				self.musicPlayerWindow(musicSelected)
+				nodeWithSong = self.finalMusicLinkList.binarySearchForNode(self.finalMusicLinkList.getHead(), self.finalMusicLinkList.getTail(), musicSelected)
+				self.playSongFromSortedLinkList(nodeWithSong)
+				# self.finalMusicLinkList.printForward()
 
 	def organizeMusicLibrary(self):
 

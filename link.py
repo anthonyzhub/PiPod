@@ -226,37 +226,87 @@ class LinkList:
 		# The return value of sortedMerge() is the head node of the new link list
 		return self.sortedMerge(leftSide, rightSide)
 
-	def binarySearch(self, leftNode, rightNode, pos):
+	def binarySearchForPosition(self, lowNode, highNode, position):
 
-		# OBJECTIVE: Find data in link list with binary search
+		# OBJECTIVE: Return data at specific position
 
-		# Exit, if either nodes are none
-		if (leftNode == None) or (rightNode == None):
-			print("Either nodes are empty")
-			exit()
+		# Base cases
+		if lowNode == None:
+			# print("lowNode is none\n")
+			return
+		elif highNode == None:
+			# print("highNode is none\n")
+			return
 
-		# Exit, if leftNode and rightNode overlap
-		if (leftNode.pos >= rightNode.pos):
-			print("Nodes are overlapping")
-			return False
+		if lowNode.pos > highNode.pos:
+			# print("Nodes are overlapping\n")
+			return
 
-		# Get middle node
-		middleNode = self.getMiddleNode(leftNode) # Start from the far left
+		# Get 2 middle nodes
+		middleNode = self.getMiddleNode(lowNode)
 		nodeAfterMiddle = middleNode.next
 
+		# Temporarily cut link list in half
 		middleNode.next = None
 
-		# Check if middleNode is at position
-		if middleNode.pos == pos:
-			return middleNode.data
+		# Make a recursive call, if needed
+		if middleNode.pos == position:
+			# print("Node found\n")
+			output = middleNode.data
 
-		# Go to right half
-		elif middleNode.pos > pos:
-			return self.binarySearch(leftNode, rightNode.prev, pos)
+		elif middleNode.pos > position:
+			output = self.binarySearchForPosition(lowNode, middleNode.prev, position)
 
-		# Go to left half
-		elif middleNode.pos < pos:
-			return self.binarySearch(middleNode.next, rightNode, pos)
+		else:
+			output = self.binarySearchForPosition(nodeAfterMiddle, highNode, position)
+
+		# Relink link list and return output
+		middleNode.next = nodeAfterMiddle
+		return output
+
+	def binarySearchForNode(self, lowNode, highNode, position):
+
+		# OBJECTIVE: Return node at specified position
+
+		# Base cases
+		if lowNode == None:
+			# print("lowNode is none\n")
+			return
+		elif highNode == None:
+			# print("highNode is none\n")
+			return
+
+		if lowNode.pos > highNode.pos:
+			# print("Nodes are overlapping\n")
+			return
+
+		# Get 2 middle nodes
+		middleNode = self.getMiddleNode(lowNode)
+		nodeBeforeMiddle = middleNode.prev
+		nodeAfterMiddle = middleNode.next
+
+		# Temporarily cut link list in half
+		middleNode.next = None
+
+		# Make a recursive call, if needed
+		if middleNode.pos > position:
+			it = self.binarySearchForNode(lowNode, middleNode.prev, position)
+
+		elif middleNode.pos < position:
+			it = self.binarySearchForNode(nodeAfterMiddle, highNode, position)
+		
+		else:
+
+			# Relink link list and set iterator node (it) as middleNode
+			middleNode.next = nodeAfterMiddle
+			middleNode.prev = nodeBeforeMiddle
+			it = middleNode
+			return it
+
+		# Incase in one recursive call the "else" was not met, then reconfigure link list
+		middleNode.next = nodeAfterMiddle
+		middleNode.prev = nodeBeforeMiddle
+		return it
 
 	def printForward(self):
 
@@ -289,6 +339,7 @@ class LinkList:
 		# Get head
 		currNode = self.getHead()
 
+		# Iterate link list
 		while currNode != None:
 			currNode.printInfo()
 			currNode = currNode.next

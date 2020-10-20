@@ -30,9 +30,7 @@ def settings():
 	entryMsg("Settings")
 
 def shuffle(musicClass):
-	entryMsg("Music Player")
 	musicClass.shuffleMusic()
-
 
 if __name__ == "__main__":
 
