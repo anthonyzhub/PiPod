@@ -1,3 +1,9 @@
+/*
+SOURCES:
+	https://jasongarr.wordpress.com/project-pages/ipod-clickwheel-hack/ by Jason Garr
+	https://hackaday.com/2010/02/05/repurposing-a-click-wheel/ by Mike Szczys
+*/
+
 #include “stdlib.h”
 #include “avr/io.h”
 #include “lcd.h”
@@ -89,6 +95,3 @@ void main(void) {
 
 	}
 }
-
-// LINK: https://jasongarr.wordpress.com/project-pages/ipod-clickwheel-hack/
-// Article: https://hackaday.com/2010/02/05/repurposing-a-click-wheel/
