@@ -1,3 +1,9 @@
+/*
+SOURCES:
+	https://jasongarr.wordpress.com/project-pages/ipod-clickwheel-hack/ by Jason Garr
+	https://hackaday.com/2010/02/05/repurposing-a-click-wheel/ by Mike Szczys
+*/
+
 #include “clickwheel.h”
 #include “avr/interrupt.h”
 
@@ -94,6 +100,3 @@ void uireset()
 	cmd_packet.word = 0x00000000;
 	cmd = 0;
 }
-
-// LINK: https://jasongarr.wordpress.com/project-pages/ipod-clickwheel-hack/
-// Article: https://hackaday.com/2010/02/05/repurposing-a-click-wheel/

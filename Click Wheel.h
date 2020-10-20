@@ -1,3 +1,9 @@
+/*
+SOURCES:
+	https://jasongarr.wordpress.com/project-pages/ipod-clickwheel-hack/ by Jason Garr
+	https://hackaday.com/2010/02/05/repurposing-a-click-wheel/ by Mike Szczys
+*/
+
 #ifndef CLICKWHEEL_H
 #define CLICKWHEEL_H
 #endif
@@ -37,6 +43,3 @@ extern unsigned char uiaction(void);
 //reset the ui action recieve buffer and cnd flag byte
 //this function should be called after responding the the new action
 extern void uireset(void);
-
-// LINK: https://jasongarr.wordpress.com/project-pages/ipod-clickwheel-hack/
-// Article: https://hackaday.com/2010/02/05/repurposing-a-click-wheel/
