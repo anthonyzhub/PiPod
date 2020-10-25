@@ -6,6 +6,7 @@ import copy
 import random
 
 from link import LinkList, Node
+from database import MusicDatabase
 
 class MusicLibrary:
 
@@ -54,17 +55,21 @@ class MusicLibrary:
 
 		# NOTE: This init() is for command line use
 
-		# Create a dictionary dedicated to artist
-		self.musicLibraryDict = dict()
+		# # Create a dictionary dedicated to artist
+		# self.musicLibraryDict = dict()
 
-		# Gather all songs inside the device and add them to self.musicLibraryDict{}
-		self.totalSongs = 0
-		self.scanMusicDirectory()
+		# # Gather all songs inside the device and add them to self.musicLibraryDict{}
+		# self.totalSongs = 0
+		# self.scanMusicDirectory()
 
-		# Create a link list of all the music in sorted order
-		self.finalMusicLinkList = LinkList()
-		self.organizeMusicLibrary()
-		self.finalMusicLinkList.size = self.totalSongs # Manually enter link list size
+		# # Create a link list of all the music in sorted order
+		# self.finalMusicLinkList = LinkList()
+		# self.organizeMusicLibrary()
+		# self.finalMusicLinkList.size = self.totalSongs # Manually enter link list size
+
+		self.db = MusicDatabase()
+		# Save music in database
+		self.addMusicToDatabase()
 
 	def entryMsg(self, location):
 
@@ -361,11 +366,11 @@ class MusicLibrary:
 			# NOTE: 
 			# 	1. For-loop breakdown: string, list, list in os.walk(starting_dir)
 			# 	2. "topdown=True" allows os.walk() to go to the bottom of the directory before going to any other
-			for directory, subDirectory, filename in os.walk(startingDir, topdown=True):
+			for directory, subDirectory, song in os.walk(startingDir, topdown=True):
 
 				# print("Directory: {}".format(directory))
 				# print("Subdirectory: {}".format(subDirectory))
-				# print("filename: {}".format(filename))
+				# print("song: {}".format(song))
 
 				try:
 					# Split directory with "/" as denominator and slice it
@@ -392,7 +397,7 @@ class MusicLibrary:
 					# If old_artist == artist, then we haven't changed singers, so there must be more albums
 					if oldArtistStr == artist:
 						# print("'old_artist' and 'artist' match!")
-						oldArtistAlbumsList = self.addSongsToDictionary(album, subDirectory, filename, oldArtistAlbumsList)
+						oldArtistAlbumsList = self.addSongsToDictionary(album, subDirectory, song, oldArtistAlbumsList)
 
 					# If old_artist != artist, then we already have all the songs from "old_artist" and need to add a new "artist"
 					if oldArtistStr != artist:
@@ -405,7 +410,7 @@ class MusicLibrary:
 						oldArtistStr = artist
 						oldArtistAlbumsList = []
 
-						oldArtistAlbumsList = self.addSongsToDictionary(album, subDirectory, filename, oldArtistAlbumsList)
+						oldArtistAlbumsList = self.addSongsToDictionary(album, subDirectory, song, oldArtistAlbumsList)
 
 				# print()
 
@@ -417,3 +422,97 @@ class MusicLibrary:
 			break
 
 		# self.printMusicDictionary()
+
+	def addMusicToDatabase(self):
+
+		# OBJECTIVE: Save all songs in directory to SQLite database
+
+		# Base case. 
+		# If database doesn't exist, create one and add songs to it.
+		# If not, then don't add any songs and exit function.
+		if not self.db.doesDatabaseExist():
+			self.db.createDatabase()
+		else:
+			return
+
+		# Get full path of Music folder
+		startingDir = "{}/Music".format(os.environ["HOME"])
+		print("Scanning device's Music directory")
+
+		while True:
+
+			# Get directories and files inside Music directory
+			# NOTE: 
+			# 	1. For-loop breakdown: string, list, list in os.walk(starting_dir)
+			# 	2. "topdown=True" allows os.walk() to go to the bottom of the directory before going to any other
+			for directory, subDirectory, songs in os.walk(startingDir, topdown=True):
+
+				try:
+					# Split directory with "/" as denominator and slice it
+					directoryList = directory.split("/")[4:]
+
+					# Get album and song name from list
+					artist = directoryList[0]
+					album = directoryList[1]
+
+					# print("Directory: {}".format(directory))
+					# print("Subdirectory: {}".format(subDirectory))
+					# print("Artist: {}".format(artist))
+					# print("Album: {}".format(album))
+					# print("Songs: {}".format(songs))
+					# print()
+
+				except:
+					# Skip to next iteration
+					continue
+
+				else:
+					
+					# If exception wasn't raised, enter data to database
+					
+					for song in songs:
+
+						# Define path name
+						# location = directory + "/" + song
+
+						# Insert new data to table
+						# NOTE: For 3rd argument, remove media file extension but keep it for file's pathname (location)
+						self.db.insert(artist, album, song[:-4], directory + "/" + song)
+
+			# Exit while-loop
+			break
+
+		# Outside of while-loop print table and close connection to datebase
+		self.db.printTable()
+		self.db.closeConnection()
+
+	def playSongFromDatabase(self):
+
+		# OBJECTIVE: When user clicks "songs", display all songs available in iPod
+
+		# Base case.
+		# Check if database exists. If yes, then show all songs. If not, create one and add all songs.
+		if not self.db.doesDatabaseExist():
+			self.addMusicToDatabase()
+
+		# Connect to database
+		self.db.connectToDatabase()
+
+		# Display everything in "song" column of database
+		self.entryMsg("Music Library")
+		self.db.printSongsAvailable()
+
+		# Ask user to select song
+		while True:
+
+			songSelected = input("Play song #")
+			
+			# If variable cannot cast to int, raise exception and ask for input again
+			try:
+				songSelected = int(songSelected)
+
+			except:
+				print("Invalid entry!")
+				continue
+				
+			else:

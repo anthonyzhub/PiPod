@@ -15,7 +15,9 @@ def entryMsg(location):
 def music(musicClass):
 
 	# Show music library
-	musicClass.showMusicLibraryWindow()
+	# musicClass.showMusicLibraryWindow()
+
+	musicClass.playSongFromDatabase()
 
 def photos():
 	entryMsg("Photo Library")
