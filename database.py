@@ -23,7 +23,8 @@ class MusicDatabase:
 							(Artist TEXT NOT NULL,
 							Album TEXT NOT NULL,
 							Song TEXT NOT NULL,
-							Location TEXT NOT NULL PRIMARY KEY UNIQUE)"""
+							Location TEXT NOT NULL UNIQUE,
+							Pos INTEGER)"""
 		)
 
 	def connectToDatabase(self):
@@ -52,36 +53,106 @@ class MusicDatabase:
 		1. INSERT INTO music => Enter data into music table
 		2. VALUES (?, ?, ?, ?) => Insert following values. Question marks were added to prevent SQL injection attack
 		"""
-		# Insert new information and commit it (save changes)
-		self.db.execute("""INSERT INTO music
-							VALUES (?, ?, ?, ?)""", (artist, album, song, location))
+
+		# Connect to database
+		self.connectToDatabase()
+
+		try:
+			# Insert new information and commit it (save changes)
+			self.db.execute("""INSERT INTO music VALUES (?, ?, ?, ?, ?)""", (artist, album, song, location, 0))
+			self.db.commit()
+		except sqlite3.IntegrityError as err:
+			print("Duplicate entry!\n Error: {}".format(err))
+
+		# Disconnect from database
+		self.db.close()
+
+	def reorganizeDatabase(self):
+
+		# OBJECTIVE: Sort database by Song and create a new column labeled index
+
+		# Connect to database
+		self.connectToDatabase()
+
+		# Create a cursor and execute sqlite command
+		rows = self.db.execute("""SELECT * FROM music ORDER BY Song""")
+
+		# Update index columns
+		for indx, row in enumerate(rows):
+			self.db.execute("""UPDATE music
+								SET Pos=(?)
+								WHERE Location=(?)""", (indx, row[3]))
+
+		# Save changes
 		self.db.commit()
+
+		# Disconnect from database
+		self.db.close()
+
+	def getSong(self, name):
+
+		# OBJECTIVE: Based on song's name, return song's pathname.
+
+		# Connect to database
+		self.connectToDatabase()
+		
+		# Create a cursor and execute sqlite command
+		row = self.db.execute("""SELECT Song, Location
+								FROM music
+								WHERE Song=(?)""", (name,)) # <= Need to make it into a tuple and add a comma
+
+		# If data wasn't found, return
+		if row == None:
+			print("Song doesn't exist!") 
+
+		else:
+			# Save data from row before disconnection from server
+			# NOTE: fetchone => execute() returns all rows meeting the criteria. fetchone() gets the 1st row
+			# 		Also, fetchone() returns a tuple (name, pathname)
+			row = row.fetchone()
+
+		# Disconnect from database and return output
+		self.db.close()
+		return row
 
 	def printTable(self):
 
 		# OBJECTIVE: Print table with cursor
 
-		# Create a crusor
+		# Connect to database
+		self.connectToDatabase()
+
+		# Create a cursor
 		cursor = self.db.execute("""SELECT * FROM music
-									ORDER BY song""")
+									ORDER BY Song""")
 
 		# Print table
 		for pos, row in enumerate(cursor):
-			print("Pos #{}".format(pos))
-			print("\t\tArtist: {}".format(row[0]))
-			print("\t\tAlbum: {}".format(row[1]))
-			print("\t\tSong: {}".format(row[2]))
-			print("\t\tLocation: {}".format(row[3]))
+			print(row)
+			# print("Pos #{}".format(pos))
+			# print("\t\tArtist: {}".format(row[0]))
+			# print("\t\tAlbum: {}".format(row[1]))
+			# print("\t\tSong: {}".format(row[2]))
+			# print("\t\tLocation: {}".format(row[3]))
+			# print("\t\tIndex: {}".format(row[4]))
+
+		# Disconnect from database
+		self.db.close()
 
 	def printSongsAvailable(self):
 
 		# OBJECTIVE: Print all songs inserted to database
 
+		# Connect to database
+		self.connectToDatabase()
+
 		# Create a crusor
-		cursor = self.db.execute("""SELECT song FROM music
-									ORDER BY song""")
+		cursor = self.db.execute("""SELECT Song FROM music
+									ORDER BY Song""")
 
 		# Only print "song" column
 		for pos, row in enumerate(cursor):
 			print("{}. {}".format(pos + 1, row[0]))
 
+		# Disconnect from database
+		self.db.close()

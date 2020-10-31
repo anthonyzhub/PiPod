@@ -67,7 +67,9 @@ class MusicLibrary:
 		# self.organizeMusicLibrary()
 		# self.finalMusicLinkList.size = self.totalSongs # Manually enter link list size
 
+		# Initialize class and connect to database
 		self.db = MusicDatabase()
+
 		# Save music in database
 		self.addMusicToDatabase()
 
@@ -427,14 +429,6 @@ class MusicLibrary:
 
 		# OBJECTIVE: Save all songs in directory to SQLite database
 
-		# Base case. 
-		# If database doesn't exist, create one and add songs to it.
-		# If not, then don't add any songs and exit function.
-		if not self.db.doesDatabaseExist():
-			self.db.createDatabase()
-		else:
-			return
-
 		# Get full path of Music folder
 		startingDir = "{}/Music".format(os.environ["HOME"])
 		print("Scanning device's Music directory")
@@ -482,21 +476,13 @@ class MusicLibrary:
 			# Exit while-loop
 			break
 
-		# Outside of while-loop print table and close connection to datebase
+		# Outside of while-loop reorganize database and print table
+		self.db.reorganizeDatabase()
 		self.db.printTable()
-		self.db.closeConnection()
 
 	def playSongFromDatabase(self):
 
 		# OBJECTIVE: When user clicks "songs", display all songs available in iPod
-
-		# Base case.
-		# Check if database exists. If yes, then show all songs. If not, create one and add all songs.
-		if not self.db.doesDatabaseExist():
-			self.addMusicToDatabase()
-
-		# Connect to database
-		self.db.connectToDatabase()
 
 		# Display everything in "song" column of database
 		self.entryMsg("Music Library")
@@ -505,14 +491,7 @@ class MusicLibrary:
 		# Ask user to select song
 		while True:
 
-			songSelected = input("Play song #")
+			songSelected = input("Play: ")
 			
-			# If variable cannot cast to int, raise exception and ask for input again
-			try:
-				songSelected = int(songSelected)
-
-			except:
-				print("Invalid entry!")
-				continue
-				
-			else:
+			# Play song from Nth row
+			print(self.db.getSong(songSelected))
