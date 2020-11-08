@@ -1,9 +1,14 @@
 
-from tkinter import *
-from playsound import playsound
+from tkinter import * # GUI
+from playsound import playsound # play audio
 import os
-import copy
+import copy # Make a deep copy of a variable
 import random
+import vlc # play audio
+# from pydub import AudioSegment
+# from pydub.playback import play
+import keyboard # Look for pressed key
+import time # Includes sleep()
 
 from link import LinkList, Node
 from database import MusicDatabase
@@ -480,18 +485,71 @@ class MusicLibrary:
 		self.db.reorganizeDatabase()
 		self.db.printTable()
 
+	def playWindow(self, songEntry):
+
+		# OBJECTIVE: A song's full pathname will be given. Play that song.
+
+		# Unpack argument variable
+		songName, songPath, songPos = songEntry[0], songEntry[1], songEntry[2]
+
+		# Initiate player
+		player = vlc.MediaPlayer(songPath)
+		player.play()
+
+		# Give playback options
+		isSongPlaying = True
+		while True:
+
+			print("\nNow Playing: {}".format(songName))
+			controls = input("f/r/p/b: ")
+
+			if controls == "f":
+				player.stop()
+
+				# Get another song based on positioning
+				songEntry = self.db.getSongByPos(songPos + 1)
+				songName, songPath, songPos = songEntry[0], songEntry[1], songEntry[2]
+
+				# Update player
+				player = vlc.MediaPlayer(songPath)
+				player.play()
+
+			elif controls == "r":
+				player.stop()
+
+				# Get another song based on positioning
+				songEntry = self.db.getSongByPos(songPos - 1)
+				songName, songPath, songPos = songEntry[0], songEntry[1], songEntry[2]
+
+				# Update player
+				player = vlc.MediaPlayer(songPath)
+				player.play()
+
+			elif controls == "p" and isSongPlaying == True:
+				player.pause()
+				isSongPlaying = False
+
+			elif controls == "p" and isSongPlaying == False:
+				player.play()
+				isSongPlaying = True
+
+			elif controls == "b":
+				break
+
 	def playSongFromDatabase(self):
 
 		# OBJECTIVE: When user clicks "songs", display all songs available in iPod
 
-		# Display everything in "song" column of database
-		self.entryMsg("Music Library")
-		self.db.printSongsAvailable()
-
 		# Ask user to select song
 		while True:
 
+			# Display everything in "song" column of database
+			self.entryMsg("Music Library")
+			self.db.printSongsAvailable()
+			
+			# Ask for what song to play
 			songSelected = input("Play: ")
 			
 			# Play song from Nth row
-			print(self.db.getSong(songSelected))
+			songSelected = self.db.getSongByName(songSelected)
+			self.playWindow(songSelected)

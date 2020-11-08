@@ -62,7 +62,7 @@ class MusicDatabase:
 			self.db.execute("""INSERT INTO music VALUES (?, ?, ?, ?, ?)""", (artist, album, song, location, 0))
 			self.db.commit()
 		except sqlite3.IntegrityError as err:
-			print("Duplicate entry!\n Error: {}".format(err))
+			print("Duplicate entry! Error: {}".format(err))
 
 		# Disconnect from database
 		self.db.close()
@@ -89,7 +89,7 @@ class MusicDatabase:
 		# Disconnect from database
 		self.db.close()
 
-	def getSong(self, name):
+	def getSongByName(self, name):
 
 		# OBJECTIVE: Based on song's name, return song's pathname.
 
@@ -97,7 +97,7 @@ class MusicDatabase:
 		self.connectToDatabase()
 		
 		# Create a cursor and execute sqlite command
-		row = self.db.execute("""SELECT Song, Location
+		row = self.db.execute("""SELECT Song, Location, Pos
 								FROM music
 								WHERE Song=(?)""", (name,)) # <= Need to make it into a tuple and add a comma
 
@@ -110,6 +110,39 @@ class MusicDatabase:
 			# NOTE: fetchone => execute() returns all rows meeting the criteria. fetchone() gets the 1st row
 			# 		Also, fetchone() returns a tuple (name, pathname)
 			row = row.fetchone()
+
+		# Disconnect from database and return output
+		self.db.close()
+		return row
+
+	def getSongByPos(self, pos):
+
+		# OBJECTIVE: Return a nearby song if a user selects Forward or Rewind
+
+		# Connect to database
+		self.connectToDatabase()
+		
+		# Create a cursor and execute sqlite command
+		# If Pos is out of bounds, then it's non-existent so return the 1st song as default value
+		row = self.db.execute("""SELECT Song, Location, Pos
+								FROM music
+								WHERE Pos=(?)""", (pos,)) # <= Need to make it into a tuple and add a comma
+
+		# Save data from row before disconnection from server
+		# NOTE: fetchone => execute() returns all rows meeting the criteria. fetchone() gets the 1st row
+		# 		Also, fetchone() returns a tuple (name, pathname)
+		row = row.fetchone()
+
+		# If data wasn't found, return
+		if row == None:
+			print("Song doesn't exist!")
+
+			# Create a cursor and get 1st row as default value
+			row = self.db.execute("""SELECT Song, Location, Pos
+									FROM music
+									WHERE Pos=0""")
+			row = row.fetchone()
+			
 
 		# Disconnect from database and return output
 		self.db.close()
@@ -129,12 +162,6 @@ class MusicDatabase:
 		# Print table
 		for pos, row in enumerate(cursor):
 			print(row)
-			# print("Pos #{}".format(pos))
-			# print("\t\tArtist: {}".format(row[0]))
-			# print("\t\tAlbum: {}".format(row[1]))
-			# print("\t\tSong: {}".format(row[2]))
-			# print("\t\tLocation: {}".format(row[3]))
-			# print("\t\tIndex: {}".format(row[4]))
 
 		# Disconnect from database
 		self.db.close()
