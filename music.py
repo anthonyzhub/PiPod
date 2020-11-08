@@ -1,11 +1,17 @@
 
-from tkinter import *
-from playsound import playsound
+from tkinter import * # GUI
+from playsound import playsound # play audio
 import os
-import copy
+import copy # Make a deep copy of a variable
 import random
+import vlc # play audio
+# from pydub import AudioSegment
+# from pydub.playback import play
+import keyboard # Look for pressed key
+import time # Includes sleep()
 
 from link import LinkList, Node
+from database import MusicDatabase
 
 class MusicLibrary:
 
@@ -54,17 +60,23 @@ class MusicLibrary:
 
 		# NOTE: This init() is for command line use
 
-		# Create a dictionary dedicated to artist
-		self.musicLibraryDict = dict()
+		# # Create a dictionary dedicated to artist
+		# self.musicLibraryDict = dict()
 
-		# Gather all songs inside the device and add them to self.musicLibraryDict{}
-		self.totalSongs = 0
-		self.scanMusicDirectory()
+		# # Gather all songs inside the device and add them to self.musicLibraryDict{}
+		# self.totalSongs = 0
+		# self.scanMusicDirectory()
 
-		# Create a link list of all the music in sorted order
-		self.finalMusicLinkList = LinkList()
-		self.organizeMusicLibrary()
-		self.finalMusicLinkList.size = self.totalSongs # Manually enter link list size
+		# # Create a link list of all the music in sorted order
+		# self.finalMusicLinkList = LinkList()
+		# self.organizeMusicLibrary()
+		# self.finalMusicLinkList.size = self.totalSongs # Manually enter link list size
+
+		# Initialize class and connect to database
+		self.db = MusicDatabase()
+
+		# Save music in database
+		self.addMusicToDatabase()
 
 	def entryMsg(self, location):
 
@@ -361,11 +373,11 @@ class MusicLibrary:
 			# NOTE: 
 			# 	1. For-loop breakdown: string, list, list in os.walk(starting_dir)
 			# 	2. "topdown=True" allows os.walk() to go to the bottom of the directory before going to any other
-			for directory, subDirectory, filename in os.walk(startingDir, topdown=True):
+			for directory, subDirectory, song in os.walk(startingDir, topdown=True):
 
 				# print("Directory: {}".format(directory))
 				# print("Subdirectory: {}".format(subDirectory))
-				# print("filename: {}".format(filename))
+				# print("song: {}".format(song))
 
 				try:
 					# Split directory with "/" as denominator and slice it
@@ -392,7 +404,7 @@ class MusicLibrary:
 					# If old_artist == artist, then we haven't changed singers, so there must be more albums
 					if oldArtistStr == artist:
 						# print("'old_artist' and 'artist' match!")
-						oldArtistAlbumsList = self.addSongsToDictionary(album, subDirectory, filename, oldArtistAlbumsList)
+						oldArtistAlbumsList = self.addSongsToDictionary(album, subDirectory, song, oldArtistAlbumsList)
 
 					# If old_artist != artist, then we already have all the songs from "old_artist" and need to add a new "artist"
 					if oldArtistStr != artist:
@@ -405,7 +417,7 @@ class MusicLibrary:
 						oldArtistStr = artist
 						oldArtistAlbumsList = []
 
-						oldArtistAlbumsList = self.addSongsToDictionary(album, subDirectory, filename, oldArtistAlbumsList)
+						oldArtistAlbumsList = self.addSongsToDictionary(album, subDirectory, song, oldArtistAlbumsList)
 
 				# print()
 
@@ -417,3 +429,127 @@ class MusicLibrary:
 			break
 
 		# self.printMusicDictionary()
+
+	def addMusicToDatabase(self):
+
+		# OBJECTIVE: Save all songs in directory to SQLite database
+
+		# Get full path of Music folder
+		startingDir = "{}/Music".format(os.environ["HOME"])
+		print("Scanning device's Music directory")
+
+		while True:
+
+			# Get directories and files inside Music directory
+			# NOTE: 
+			# 	1. For-loop breakdown: string, list, list in os.walk(starting_dir)
+			# 	2. "topdown=True" allows os.walk() to go to the bottom of the directory before going to any other
+			for directory, subDirectory, songs in os.walk(startingDir, topdown=True):
+
+				try:
+					# Split directory with "/" as denominator and slice it
+					directoryList = directory.split("/")[4:]
+
+					# Get album and song name from list
+					artist = directoryList[0]
+					album = directoryList[1]
+
+					# print("Directory: {}".format(directory))
+					# print("Subdirectory: {}".format(subDirectory))
+					# print("Artist: {}".format(artist))
+					# print("Album: {}".format(album))
+					# print("Songs: {}".format(songs))
+					# print()
+
+				except:
+					# Skip to next iteration
+					continue
+
+				else:
+					
+					# If exception wasn't raised, enter data to database
+					
+					for song in songs:
+
+						# Define path name
+						# location = directory + "/" + song
+
+						# Insert new data to table
+						# NOTE: For 3rd argument, remove media file extension but keep it for file's pathname (location)
+						self.db.insert(artist, album, song[:-4], directory + "/" + song)
+
+			# Exit while-loop
+			break
+
+		# Outside of while-loop reorganize database and print table
+		self.db.reorganizeDatabase()
+		self.db.printTable()
+
+	def playWindow(self, songEntry):
+
+		# OBJECTIVE: A song's full pathname will be given. Play that song.
+
+		# Unpack argument variable
+		songName, songPath, songPos = songEntry[0], songEntry[1], songEntry[2]
+
+		# Initiate player
+		player = vlc.MediaPlayer(songPath)
+		player.play()
+
+		# Give playback options
+		isSongPlaying = True
+		while True:
+
+			print("\nNow Playing: {}".format(songName))
+			controls = input("f/r/p/b: ")
+
+			if controls == "f":
+				player.stop()
+
+				# Get another song based on positioning
+				songEntry = self.db.getSongByPos(songPos + 1)
+				songName, songPath, songPos = songEntry[0], songEntry[1], songEntry[2]
+
+				# Update player
+				player = vlc.MediaPlayer(songPath)
+				player.play()
+
+			elif controls == "r":
+				player.stop()
+
+				# Get another song based on positioning
+				songEntry = self.db.getSongByPos(songPos - 1)
+				songName, songPath, songPos = songEntry[0], songEntry[1], songEntry[2]
+
+				# Update player
+				player = vlc.MediaPlayer(songPath)
+				player.play()
+
+			elif controls == "p" and isSongPlaying == True:
+				player.pause()
+				isSongPlaying = False
+
+			elif controls == "p" and isSongPlaying == False:
+				player.play()
+				isSongPlaying = True
+
+			elif controls == "b":
+				break
+
+	def playSongFromDatabase(self):
+
+		# OBJECTIVE: When user clicks "songs", display all songs available in iPod
+
+		# Ask user to select song
+		while True:
+
+			# Display everything in "song" column of database
+			self.entryMsg("Music Library")
+			self.db.printSongsAvailable()
+			
+			# Ask for what song to play
+			songSelected = input("Play: ")
+			
+			# Play song from Nth row
+			songSelected = self.db.getSongByName(songSelected)
+			self.playWindow(songSelected)
