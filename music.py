@@ -45,6 +45,14 @@ class MusicLibrary:
 		# Save music in database
 		self.addMusicToDatabase()
 
+		# Save browsing history.
+		# self.windowDict = {'musicMenuWindow': musicMenuWindow,
+						# 'artistsWindow': artistsWindow,
+						# 'songsWindow': songsWindow,
+						# 'playWindow': playWindow
+						# }
+		self.windowHistory = list()
+
 	def entryMsg(self, location):
 
 		# OBJECTIVE: Display a message whenever the user enters a new window
@@ -56,6 +64,16 @@ class MusicLibrary:
 
 		# OBJECTIVE: Print a custom message if an exception or error rises
 		print("ERROR: {}".format(msg))
+
+	def addHistory(self, func):
+
+		# OBJECTIVE: Add visiting function to stack
+		self.windowHistory.append(func)
+
+	def removeHistory(self):
+
+		# OBJECTIVE: Return most recently visited function
+		return removeHistory.pop()
 
 	def addRemainingNodes(self, newLinkList, headA):
 
@@ -456,6 +474,9 @@ class MusicLibrary:
 
 		# OBJECTIVE: Unpack tuple and play song from path
 
+		# Add calling history to stack
+		self.addHistory('playWindow')
+
 		# Unpack argument variable
 		songName, songPath, songPos = songEntry[0], songEntry[1], songEntry[2]
 
@@ -512,6 +533,9 @@ class MusicLibrary:
 
 		# OBJECTIVE: When user clicks "songs", display all songs available in iPod
 
+		# Add calling history to stack
+		self.addHistory('songsWindow')
+
 		# Ask user to select song
 		while True:
 
@@ -535,6 +559,12 @@ class MusicLibrary:
 
 		# OBJECTIVE: Ask user to select an artist from the table
 
+<<<<<<< HEAD
+=======
+		# Add calling history to stack
+		self.addHistory('artistsWindow')
+
+>>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f
 		while True:
 
 			# Print filter table
@@ -560,6 +590,12 @@ class MusicLibrary:
 
 		# OBJECTIVE: Ask user to select an ablum from the table
 
+<<<<<<< HEAD
+=======
+		# Add calling history to stack
+		self.addHistory('albumsWindow')
+
+>>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f
 		while True:
 
 			# Print table of albums inside device
@@ -572,11 +608,21 @@ class MusicLibrary:
 
 			# Get a song
 			songSelected = input("\nSelect Song: ")
+<<<<<<< HEAD
+=======
+			# self.db.
+>>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f
 
 	def musicMenuWindow(self):
 
 		# OBJECTIVE: Create a window and display a few options (Artists, Albums, Songs)
 
+<<<<<<< HEAD
+=======
+		# Add calling history to stack
+		self.addHistory('musicMenuWindow')
+
+>>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f
 		while True:
 
 			# Print options
@@ -585,6 +631,7 @@ class MusicLibrary:
 
 			if windowSelected == "Artists":
 				self.artistsWindow()
+<<<<<<< HEAD
 
 			elif windowSelected == "Albums":
 				self.albumsWindow()
@@ -594,3 +641,17 @@ class MusicLibrary:
 				
 			elif windowSelected == "b":
 				break
+=======
+				self.removeHistory()
+
+			elif windowSelected == "Albums":
+				pass
+			elif windowSelected == "Songs":
+				self.songsWindow()
+				self.removeHistory()
+				
+			elif windowSelected == "b":
+				break
+			else:
+				pass
+>>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f

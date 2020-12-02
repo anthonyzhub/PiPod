@@ -295,7 +295,11 @@ class MusicDatabase:
 		self.connectToDatabase()
 
 		# Create a cursor
+<<<<<<< HEAD
 		cursor = self.allSongsDB.execute("""SELECT DISTINCT Album
+=======
+		cursor = self.allSongsDB.execute("""SELECT Album
+>>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f
 											FROM music
 											ORDER BY Album""")
 
@@ -313,7 +317,11 @@ class MusicDatabase:
 		self.connectToDatabase()
 
 		# Create a cursor
+<<<<<<< HEAD
 		cursor = self.allSongsDB.execute("""SELECT DISTINCT Album, Song
+=======
+		cursor = self.allSongsDB.execute("""SELECT Album, Song
+>>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f
 											FROM music
 											WHERE Album=(?)
 											ORDER BY Song""", (album,))
