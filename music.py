@@ -1,13 +1,7 @@
-
-from tkinter import * # GUI
-from playsound import playsound # play audio
 import os
 import copy # Make a deep copy of a variable
 import random
 import vlc # play audio
-# from pydub import AudioSegment
-# from pydub.playback import play
-import keyboard # Look for pressed key
 import time # Includes sleep()
 
 from link import LinkList, Node
@@ -15,33 +9,6 @@ from database import MusicDatabase
 
 class MusicLibrary:
 
-	"""
-	def __init__(self, WIN_WIDTH, WIN_HEIGHT):
-
-		# NOTE: This init() is for GUI use
-
-		# Create a new window
-		self.musicWindow = Toplevel()
-		self.musicWindow.geometry("{}x{}".format(WIN_WIDTH, WIN_HEIGHT))
-		self.musicWindow.title("Music Library")
-
-		# Create a dictionary dedicated to artist
-		self.musicLibraryDict = dict()
-
-		# Gather all songs inside the device and add them to self.musicLibraryDict{}
-		self.totalSongs = 0
-		self.scanMusicDirectory()
-
-		# Create a link list of all the music in sorted order
-		self.finalMusicLinkList = LinkList()
-		self.organizeMusicLibrary()
-		self.finalMusicLinkList.size = self.totalSongs # Manually enter link list size
-
-		# Create a scrollable list
-		self.listBox = Listbox(self.musicWindow, selectmode=BROWSE) # <= BROWSE allows the user to scroll the list and only select 1 item
-		self.listBox.pack()
-		self.populateListBox()
-	"""
 	"""
 	NOTE: music_library structure:
 
@@ -60,14 +27,14 @@ class MusicLibrary:
 
 		# NOTE: This init() is for command line use
 
-		# # Create a dictionary dedicated to artist
+		# Create a dictionary dedicated to artist
 		# self.musicLibraryDict = dict()
 
-		# # Gather all songs inside the device and add them to self.musicLibraryDict{}
+		# Gather all songs inside the device and add them to self.musicLibraryDict{}
 		# self.totalSongs = 0
 		# self.scanMusicDirectory()
 
-		# # Create a link list of all the music in sorted order
+		# Create a link list of all the music in sorted order
 		# self.finalMusicLinkList = LinkList()
 		# self.organizeMusicLibrary()
 		# self.finalMusicLinkList.size = self.totalSongs # Manually enter link list size
@@ -476,7 +443,7 @@ class MusicLibrary:
 
 						# Insert new data to table
 						# NOTE: For 3rd argument, remove media file extension but keep it for file's pathname (location)
-						self.db.insert(artist, album, song[:-4], directory + "/" + song)
+						self.db.insert(artist, album, song, directory + "/" + song)
 
 			# Exit while-loop
 			break
@@ -487,7 +454,7 @@ class MusicLibrary:
 
 	def playWindow(self, songEntry):
 
-		# OBJECTIVE: A song's full pathname will be given. Play that song.
+		# OBJECTIVE: Unpack tuple and play song from path
 
 		# Unpack argument variable
 		songName, songPath, songPos = songEntry[0], songEntry[1], songEntry[2]
@@ -503,6 +470,7 @@ class MusicLibrary:
 			print("\nNow Playing: {}".format(songName))
 			controls = input("f/r/p/b: ")
 
+			# Forward
 			if controls == "f":
 				player.stop()
 
@@ -514,6 +482,7 @@ class MusicLibrary:
 				player = vlc.MediaPlayer(songPath)
 				player.play()
 
+			# Rewind
 			elif controls == "r":
 				player.stop()
 
@@ -525,18 +494,21 @@ class MusicLibrary:
 				player = vlc.MediaPlayer(songPath)
 				player.play()
 
+			# Pause
 			elif controls == "p" and isSongPlaying == True:
 				player.pause()
 				isSongPlaying = False
 
+			# Play
 			elif controls == "p" and isSongPlaying == False:
 				player.play()
 				isSongPlaying = True
 
+			# Go back
 			elif controls == "b":
 				break
 
-	def playSongFromDatabase(self):
+	def songsWindow(self):
 
 		# OBJECTIVE: When user clicks "songs", display all songs available in iPod
 
@@ -545,11 +517,80 @@ class MusicLibrary:
 
 			# Display everything in "song" column of database
 			self.entryMsg("Music Library")
-			self.db.printSongsAvailable()
+			self.db.printSongsTable()
 			
 			# Ask for what song to play
 			songSelected = input("Play: ")
+
+			# Provide an exit
+			if songSelected == "b":
+				break
 			
-			# Play song from Nth row
-			songSelected = self.db.getSongByName(songSelected)
+			# Get entire row featuring song's path
+			songSelected = self.db.getSongDetails(songSelected)
+			print(songSelected)
 			self.playWindow(songSelected)
+
+	def artistsWindow(self):
+
+		# OBJECTIVE: Ask user to select an artist from the table
+
+		while True:
+
+			# Print filter table
+			print()
+			self.db.printArtistsTable()
+
+			# Print a table of artist's songs
+			artistSelected = input("\nSelect Artist: ")
+			self.db.getArtistAlbums(artistSelected)
+
+			# Print songs inside album
+			albumSelected = input("\nSelect Album: ")
+			self.db.getAlbumSongs(albumSelected)
+
+			# Get song's path
+			songSelected = input("\nSelect Song: ")
+			songSelected = self.db.getSongByName(songSelected)
+
+			# Sent song's path to play window
+			self.playWindow(songSelected)
+
+	def albumsWindow(self):
+
+		# OBJECTIVE: Ask user to select an ablum from the table
+
+		while True:
+
+			# Print table of albums inside device
+			print()
+			self.db.printAlbumsTable()
+
+			# Get and print all songs in album
+			albumSelected = input("\nSelect Album: ")
+			self.db.getAlbumSongs(albumSelected)
+
+			# Get a song
+			songSelected = input("\nSelect Song: ")
+
+	def musicMenuWindow(self):
+
+		# OBJECTIVE: Create a window and display a few options (Artists, Albums, Songs)
+
+		while True:
+
+			# Print options
+			print("\n1. Artists\n2. Albums\n3. Songs\n")
+			windowSelected = input("Window Selection: ")
+
+			if windowSelected == "Artists":
+				self.artistsWindow()
+
+			elif windowSelected == "Albums":
+				self.albumsWindow()
+			
+			elif windowSelected == "Songs":
+				self.songsWindow()
+				
+			elif windowSelected == "b":
+				break
