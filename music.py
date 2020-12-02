@@ -559,12 +559,6 @@ class MusicLibrary:
 
 		# OBJECTIVE: Ask user to select an artist from the table
 
-<<<<<<< HEAD
-=======
-		# Add calling history to stack
-		self.addHistory('artistsWindow')
-
->>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f
 		while True:
 
 			# Print filter table
@@ -590,12 +584,6 @@ class MusicLibrary:
 
 		# OBJECTIVE: Ask user to select an ablum from the table
 
-<<<<<<< HEAD
-=======
-		# Add calling history to stack
-		self.addHistory('albumsWindow')
-
->>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f
 		while True:
 
 			# Print table of albums inside device
@@ -608,21 +596,11 @@ class MusicLibrary:
 
 			# Get a song
 			songSelected = input("\nSelect Song: ")
-<<<<<<< HEAD
-=======
-			# self.db.
->>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f
 
 	def musicMenuWindow(self):
 
 		# OBJECTIVE: Create a window and display a few options (Artists, Albums, Songs)
 
-<<<<<<< HEAD
-=======
-		# Add calling history to stack
-		self.addHistory('musicMenuWindow')
-
->>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f
 		while True:
 
 			# Print options
@@ -631,7 +609,6 @@ class MusicLibrary:
 
 			if windowSelected == "Artists":
 				self.artistsWindow()
-<<<<<<< HEAD
 
 			elif windowSelected == "Albums":
 				self.albumsWindow()
@@ -641,17 +618,3 @@ class MusicLibrary:
 				
 			elif windowSelected == "b":
 				break
-=======
-				self.removeHistory()
-
-			elif windowSelected == "Albums":
-				pass
-			elif windowSelected == "Songs":
-				self.songsWindow()
-				self.removeHistory()
-				
-			elif windowSelected == "b":
-				break
-			else:
-				pass
->>>>>>> 3bdc70537c7599e3b521d14a8521d0c62d41273f
